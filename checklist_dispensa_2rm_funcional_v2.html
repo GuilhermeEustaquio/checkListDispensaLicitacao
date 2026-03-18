@@ -241,15 +241,6 @@
     font-weight:700;
     font-size:14px;
   }
-  .motivos-subtitle {
-    font-size:12px;
-    font-weight:700;
-    color:#6a4b00;
-    margin:4px 0 6px;
-  }
-  .motivos-subblock {
-    display:none;
-  }
   .motivos-list {
     display:flex;
     flex-direction:column;
@@ -302,28 +293,33 @@
     padding:0;
   }
 
-  .sign-meta {
-    width:100%;
-    border-collapse:collapse;
+  .sign-form {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:12px;
     margin-top:12px;
-    table-layout:fixed;
   }
-  .sign-meta td {
-    border:1px solid var(--line);
-    padding:8px 10px;
-  }
-  .sign-meta .label {
-    width:110px;
-    background:#f7f9fb;
+  .sign-form label {
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-size:13px;
     font-weight:700;
   }
-  .sign-meta input {
+  .sign-form input {
     width:100%;
-    border:none;
+    border:1px solid var(--line);
     outline:none;
-    background:transparent;
+    background:#fff;
     font-family:inherit;
     font-size:14px;
+    padding:10px;
+  }
+  .sign-date-formal {
+    margin-top:18px;
+    text-align:right;
+    font-size:14px;
+    min-height:22px;
   }
 
   .sign-lines {
@@ -342,10 +338,17 @@
   .sign-line {
     width:100%;
     border-top:1px solid #000;
-    padding-top:8px;
+    padding-top:10px;
     font-size:13px;
-    line-height:1.45;
-    min-height:44px;
+    line-height:1.5;
+    min-height:52px;
+  }
+  .sign-name {
+    font-weight:700;
+    text-transform:uppercase;
+  }
+  .sign-role {
+    font-size:12px;
   }
   .footer {
     padding:0 26px 24px;
@@ -360,6 +363,17 @@
   }
   .admin-panel {
     padding:0 26px 24px;
+  }
+  .project-save-box {
+    margin-top:12px;
+    padding:12px;
+    border:1px dashed var(--line);
+    background:#f8fbfd;
+  }
+  .project-save-box p {
+    margin:6px 0 0;
+    color:var(--muted);
+    font-size:13px;
   }
   .admin-header, .admin-card-head {
     display:flex;
@@ -459,10 +473,17 @@
       padding:0 !important;
       color:#000 !important;
     }
-    details.motivos-box {
+    details.motivos-box,
+    .sign-form,
+    .project-save-box {
       display:none !important;
     }
-    .meta-table td, .sign-meta td, .item, .despacho-box {
+    .sign-date-formal {
+      display:block !important;
+      margin-top:24px;
+      margin-bottom:28px;
+    }
+    .meta-table td, .item, .despacho-box {
       border-color:#666 !important;
     }
     @page {
@@ -529,27 +550,31 @@
           </div>
         </div>
 
-        <table class="sign-meta">
-          <tr>
-            <td class="label">LOCAL</td>
-            <td><input id="local" placeholder="Ex.: São Paulo - SP"></td>
-            <td class="label">DATA</td>
-            <td><input id="dataAss" placeholder="Ex.: 18 de março de 2026"></td>
-          </tr>
-        </table>
+        <div class="sign-form">
+          <label>Local
+            <input id="local" placeholder="Ex.: São Paulo">
+          </label>
+          <label>Data
+            <input id="dataAss" placeholder="Ex.: 18/03/2026">
+          </label>
+          <label>Nome do responsável
+            <input id="responsavelNome" placeholder="Nome completo">
+          </label>
+          <label>Função / Posto / Graduação
+            <input id="responsavelCargo" placeholder="Ex.: Chefe da Seção de Licitações / Cap QOC">
+          </label>
+        </div>
+
+        <div class="sign-date-formal" id="signDateFormal"></div>
 
         <div class="sign-lines single-sign">
           <div class="sign-block">
-            <div class="sign-line" id="sig-responsavel">Responsável pela conferência<br>Função/Posto-Graduação</div>
+            <div class="sign-line" id="sig-responsavel">
+              <div class="sign-name">Responsável pela conferência</div>
+              <div class="sign-role">Função / Posto / Graduação</div>
+            </div>
           </div>
         </div>
-
-        <table class="sign-meta" style="margin-top:18px;">
-          <tr>
-            <td class="label">RESPONSÁVEL</td>
-            <td><input id="responsavel" placeholder="Nome completo / função / posto-graduação"></td>
-          </tr>
-        </table>
       </div>
 
       <section class="admin-panel" id="adminPanel" hidden>
@@ -560,8 +585,13 @@
           </div>
           <div class="admin-actions">
             <button class="main-btn" id="btnAdminSave">Salvar configurações</button>
+            <button class="alt-btn" id="btnAdminExport">Salvar projeto HTML</button>
             <button class="alt-btn" id="btnAdminReset">Restaurar padrão</button>
           </div>
+        </div>
+        <div class="project-save-box">
+          <strong>Persistência real no projeto</strong>
+          <p>Use <em>Salvar projeto HTML</em> para gravar as configurações e os dados atuais em uma nova cópia do arquivo HTML, mantendo as alterações aplicadas quando o documento for aberto em outra máquina.</p>
         </div>
         <div class="admin-grid">
           <section class="admin-card">
@@ -585,6 +615,12 @@
     </div>
   </div>
 
+<script id="projectState" type="application/json">
+{
+  "config": null,
+  "data": null
+}
+</script>
 <script>
 const DEFAULT_CONFIG = {
   formFields: {
@@ -594,43 +630,56 @@ const DEFAULT_CONFIG = {
     titulo: { label: "TÍTULO", placeholder: "Conformidade do Processo (Art. 72) e Termo de Justificativas", value: "Conformidade do Processo (Art. 72) e Termo de Justificativas" }
   },
   items: [
-    { title: "DFD, ETP, Análise de Riscos e TR", description: "• DFD: necessidade/objeto/quantidade/justificativa • ETP/Riscos: se aplicável • TR/Projeto: quando exigido", motivos: { "Parcialmente": ["O DFD foi juntado aos autos, porém carece de melhor detalhamento quanto ao objeto, quantitativos ou justificativa da necessidade.", "O TR/Projeto Básico foi apresentado de forma preliminar, demandando ajustes antes do prosseguimento da contratação."], "Não": ["Não consta nos autos DFD/ETP/TR suficientes para demonstrar a necessidade, o escopo e os requisitos mínimos da contratação.", "Os documentos preparatórios essenciais não foram identificados ou estão ausentes no processo."] } },
-    { title: "Estimativa de Despesa (Art. 23)", description: "• Cotações formais (art. 23, §1º, IV) • Equalização de escopo • Critério [média/mediana] • Dentro do limite legal aplicável", motivos: { "Parcialmente": ["A pesquisa de preços foi realizada direto com o fornecedor, devido à inexistência de contratações similares recentes no Painel de Preços ou no PNCP que guardem identidade com o objeto pretendido, sendo a cotação direta a única via para aferir o valor atual praticado pelo mercado.", "A pesquisa de preços consta nos autos, porém necessita de melhor demonstração da metodologia utilizada, da equalização do escopo e da compatibilidade com o objeto pretendido."], "Não": ["Não consta pesquisa de preços apta a demonstrar a compatibilidade do valor estimado com o praticado pelo mercado.", "As cotações apresentadas não permitem aferir o preço estimado em razão da divergência de escopo, ausência de metodologia ou desatualização dos valores."] } },
-    { title: "Justificativa da Dispensa", description: "• Fundamento legal • Documento de justificativa • Motivação da escolha da solução", motivos: { "Parcialmente": ["A justificativa da dispensa foi apresentada, porém necessita de complementação quanto à motivação e ao enquadramento legal da contratação.", "Consta fundamentação legal, mas sem robustez suficiente para demonstrar, de forma clara, a adequação da hipótese de contratação direta."], "Não": ["Não consta justificativa formal da contratação direta com indicação expressa do fundamento legal aplicável.", "O processo não apresenta motivação suficiente para amparar a adoção da dispensa."] } },
-    { title: "Razão da Escolha do Fornecedor", description: "• Comprovação da escolha • Compatibilidade com o objeto • Motivação da seleção", motivos: { "Parcialmente": ["A razão da escolha do fornecedor foi apresentada, mas necessita de complementação para demonstrar a correlação com o objeto e a vantajosidade.", "Constam elementos de escolha, porém sem robustez suficiente para justificar a seleção do fornecedor específico."], "Não": ["Não consta justificativa apta para demonstrar a razão da escolha do fornecedor.", "O processo não apresenta motivação suficiente para a seleção do fornecedor contratado."] } },
-    { title: "Autorização da Autoridade Competente", description: "• Autorização formal • Assinatura competente • Data do ato", motivos: { "Parcialmente": ["A autorização consta nos autos, porém sem assinatura válida, sem data ou com necessidade de ratificação formal.", "A aprovação foi registrada de forma incompleta, carecendo de regularização pela autoridade competente."], "Não": ["Não consta autorização formal da autoridade competente para a contratação direta.", "O processo não apresenta ato de aprovação válido para o prosseguimento da contratação."] } },
-    { title: "Publicidade e Divulgação", description: "• PNCP / Portal oficial • Divulgação dos atos essenciais • Transparência mínima exigida", motivos: { "Parcialmente": ["Há indícios de publicidade parcial dos atos, porém sem comprovação integral das divulgações exigidas.", "A divulgação foi iniciada, mas ainda carece de comprovação ou complementação documental."], "Não": ["Não consta comprovação de publicidade/divulgação dos atos exigidos para a contratação direta.", "O processo não demonstra atendimento às exigências mínimas de transparência."] } },
-    { title: "Conformidade Geral da Instrução", description: "• Verificação final da suficiência documental • Regularidade formal para prosseguimento", motivos: { "Parcialmente": ["O processo apresenta instrução parcial, com pendências formais sanáveis antes da contratação.", "A documentação principal foi juntada, mas ainda há necessidade de complementação para o regular prosseguimento."], "Não": ["O processo não reúne, até o momento, os elementos mínimos necessários para a contratação.", "A instrução processual encontra-se incompleta, impedindo o prosseguimento regular."] } }
+    { title: "DFD, ETP, Análise de Riscos e TR", description: "• DFD: necessidade/objeto/quantidade/justificativa • ETP/Riscos: se aplicável • TR/Projeto: quando exigido", motivos: ["O DFD foi juntado aos autos, porém carece de melhor detalhamento quanto ao objeto, quantitativos ou justificativa da necessidade.", "O TR/Projeto Básico foi apresentado de forma preliminar, demandando ajustes antes do prosseguimento da contratação.", "Não consta nos autos DFD/ETP/TR suficientes para demonstrar a necessidade, o escopo e os requisitos mínimos da contratação.", "Os documentos preparatórios essenciais não foram identificados ou estão ausentes no processo."] },
+    { title: "Estimativa de Despesa (Art. 23)", description: "• Cotações formais (art. 23, §1º, IV) • Equalização de escopo • Critério [média/mediana] • Dentro do limite legal aplicável", motivos: ["A pesquisa de preços foi realizada direto com o fornecedor, devido à inexistência de contratações similares recentes no Painel de Preços ou no PNCP que guardem identidade com o objeto pretendido, sendo a cotação direta a única via para aferir o valor atual praticado pelo mercado.", "A pesquisa de preços consta nos autos, porém necessita de melhor demonstração da metodologia utilizada, da equalização do escopo e da compatibilidade com o objeto pretendido.", "Não consta pesquisa de preços apta a demonstrar a compatibilidade do valor estimado com o praticado pelo mercado.", "As cotações apresentadas não permitem aferir o preço estimado em razão da divergência de escopo, ausência de metodologia ou desatualização dos valores."] },
+    { title: "Justificativa da Dispensa", description: "• Fundamento legal • Documento de justificativa • Motivação da escolha da solução", motivos: ["A justificativa da dispensa foi apresentada, porém necessita de complementação quanto à motivação e ao enquadramento legal da contratação.", "Consta fundamentação legal, mas sem robustez suficiente para demonstrar, de forma clara, a adequação da hipótese de contratação direta.", "Não consta justificativa formal da contratação direta com indicação expressa do fundamento legal aplicável.", "O processo não apresenta motivação suficiente para amparar a adoção da dispensa."] },
+    { title: "Razão da Escolha do Fornecedor", description: "• Comprovação da escolha • Compatibilidade com o objeto • Motivação da seleção", motivos: ["A razão da escolha do fornecedor foi apresentada, mas necessita de complementação para demonstrar a correlação com o objeto e a vantajosidade.", "Constam elementos de escolha, porém sem robustez suficiente para justificar a seleção do fornecedor específico.", "Não consta justificativa apta para demonstrar a razão da escolha do fornecedor.", "O processo não apresenta motivação suficiente para a seleção do fornecedor contratado."] },
+    { title: "Autorização da Autoridade Competente", description: "• Autorização formal • Assinatura competente • Data do ato", motivos: ["A autorização consta nos autos, porém sem assinatura válida, sem data ou com necessidade de ratificação formal.", "A aprovação foi registrada de forma incompleta, carecendo de regularização pela autoridade competente.", "Não consta autorização formal da autoridade competente para a contratação direta.", "O processo não apresenta ato de aprovação válido para o prosseguimento da contratação."] },
+    { title: "Publicidade e Divulgação", description: "• PNCP / Portal oficial • Divulgação dos atos essenciais • Transparência mínima exigida", motivos: ["Há indícios de publicidade parcial dos atos, porém sem comprovação integral das divulgações exigidas.", "A divulgação foi iniciada, mas ainda carece de comprovação ou complementação documental.", "Não consta comprovação de publicidade/divulgação dos atos exigidos para a contratação direta.", "O processo não demonstra atendimento às exigências mínimas de transparência."] },
+    { title: "Conformidade Geral da Instrução", description: "• Verificação final da suficiência documental • Regularidade formal para prosseguimento", motivos: ["O processo apresenta instrução parcial, com pendências formais sanáveis antes da contratação.", "A documentação principal foi juntada, mas ainda há necessidade de complementação para o regular prosseguimento.", "O processo não reúne, até o momento, os elementos mínimos necessários para a contratação.", "A instrução processual encontra-se incompleta, impedindo o prosseguimento regular."] }
   ]
 };
 
 const STORAGE_KEY = "checklist_cro2_v4";
-const CONFIG_KEY = "checklist_cro2_config_v1";
 const ADMIN_PASSWORD_KEY = "checklist_cro2_admin_password";
 const progressFill = document.getElementById("progressFill");
 const progressLabel = document.getElementById("progressLabel");
-let config = loadConfig();
 
-function loadConfig() {
-  const raw = localStorage.getItem(CONFIG_KEY);
-  if (!raw) return structuredClone(DEFAULT_CONFIG);
+function normalizeConfig(source) {
+  const base = structuredClone(DEFAULT_CONFIG);
+  if (!source || typeof source !== "object") return base;
+  return {
+    formFields: Object.fromEntries(Object.entries(base.formFields).map(([key, value]) => [key, { ...value, ...(source.formFields?.[key] || {}) }])),
+    items: Array.isArray(source.items) && source.items.length
+      ? source.items.map(item => ({
+          title: item.title || "",
+          description: item.description || "",
+          motivos: Array.isArray(item.motivos) ? item.motivos.filter(Boolean) : []
+        }))
+      : base.items
+  };
+}
+
+function readEmbeddedState() {
+  const node = document.getElementById("projectState");
+  if (!node) return { config: null, data: null };
   try {
-    const parsed = JSON.parse(raw);
-    return {
-      formFields: { ...structuredClone(DEFAULT_CONFIG.formFields), ...(parsed.formFields || {}) },
-      items: Array.isArray(parsed.items) && parsed.items.length ? parsed.items : structuredClone(DEFAULT_CONFIG.items)
-    };
+    return JSON.parse(node.textContent);
   } catch (error) {
-    console.error("Erro ao carregar configurações:", error);
-    return structuredClone(DEFAULT_CONFIG);
+    console.error("Erro ao ler estado embutido:", error);
+    return { config: null, data: null };
   }
 }
 
-function saveConfig(showAlert = true) {
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-  applyFormFieldConfig();
-  renderChecklist();
-  if (showAlert) alert("Configurações administrativas salvas com sucesso.");
+const embeddedState = readEmbeddedState();
+let config = normalizeConfig(embeddedState.config);
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
 
 function applyFormFieldConfig() {
@@ -645,58 +694,22 @@ function applyFormFieldConfig() {
   });
 }
 
-function renderChecklist() {
-  const container = document.getElementById("checklistContent");
-  const saved = collectData();
-  container.innerHTML = config.items.map((item, index) => `
-    <section class="item" data-index="${index}">
-      <div class="item-head">
-        <div>
-          <h4>${index + 1} — ${item.title} <span class="badge" id="badge-${index}" style="display:none;"></span></h4>
-          <p class="desc">${item.description || ""}</p>
-        </div>
-      </div>
-      <div class="item-grid">
-        <div class="status-panel">
-          <div class="field-title">Atendido?</div>
-          <div class="status-group">
-            ${["Sim", "Parcialmente", "Não", "N/A"].map(status => `<label class="status-option"><input type="radio" name="status-${index}" value="${status}"><span>${status}</span></label>`).join("")}
-          </div>
-          <details class="motivos-box" id="motivos-${index}">
-            <summary>Motivos sugeridos</summary>
-            <div class="motivos-content">
-              ${["Parcialmente", "Não"].map(status => `
-                <div class="motivos-subblock" data-for="${status}">
-                  <div class="motivos-subtitle">Sugestões para “${status}”</div>
-                  <div class="motivos-list">
-                    ${(item.motivos?.[status] || []).map(text => `<button type="button" class="motivo-chip" data-index="${index}" data-status="${status}" data-text="${escapeHtml(text)}">• ${escapeHtml(text)}</button>`).join("") || '<span class="motivos-empty">Nenhum motivo cadastrado.</span>'}
-                  </div>
-                </div>`).join("")}
-            </div>
-          </details>
-        </div>
-        <div class="obs-panel">
-          <label for="obs-${index}" class="field-title">Observação:</label>
-          <textarea id="obs-${index}" placeholder="Descreva a situação, pendências ou observações."></textarea>
-        </div>
-      </div>
-    </section>`).join("");
-
-  bindChecklistEvents();
-  restoreChecklistItems(saved.itens || []);
-  updateProgress();
-}
-
-function bindChecklistEvents() {
-  document.querySelectorAll('input[type="radio"]').forEach(el => {
-    el.addEventListener("change", () => { updateProgress(); saveData(false); });
-  });
-  document.querySelectorAll(".motivo-chip").forEach(btn => {
-    btn.addEventListener("click", () => appendMotivo(Number(btn.dataset.index), btn.dataset.text));
-  });
-  document.querySelectorAll('[id^="obs-"]').forEach(el => {
-    el.addEventListener("input", () => saveData(false));
-  });
+function collectData() {
+  return {
+    nup: document.getElementById("nup").value,
+    data: document.getElementById("data").value,
+    objeto: document.getElementById("objeto").value,
+    titulo: document.getElementById("titulo").value,
+    obsFinal: document.getElementById("obsFinal").value,
+    local: document.getElementById("local").value,
+    dataAss: document.getElementById("dataAss").value,
+    responsavelNome: document.getElementById("responsavelNome").value,
+    responsavelCargo: document.getElementById("responsavelCargo").value,
+    itens: config.items.map((_, i) => ({
+      status: document.querySelector(`input[name="status-${i}"]:checked`)?.value || "",
+      observacao: document.getElementById(`obs-${i}`)?.value || ""
+    }))
+  };
 }
 
 function restoreChecklistItems(items) {
@@ -710,19 +723,76 @@ function restoreChecklistItems(items) {
   });
 }
 
-function escapeHtml(text) {
-  return String(text)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
-}
-
 function getBadgeClass(status) {
   if (status === "Sim") return ["Sim", "sim"];
   if (status === "Parcialmente") return ["Parcialmente", "parcial"];
   if (status === "Não") return ["Não", "nao"];
   return ["N/A", "na"];
+}
+
+function saveData(showAlert = true) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+  if (showAlert) alert("Dados salvos com sucesso no navegador atual.");
+}
+
+function appendMotivo(index, text) {
+  const obs = document.getElementById(`obs-${index}`);
+  if (!obs) return;
+  const current = obs.value.trim();
+  obs.value = !current ? `Motivo: ${text}` : current.includes(text) ? current : `${current}
+
+Motivo: ${text}`;
+  saveData(false);
+}
+
+function bindChecklistEvents() {
+  document.querySelectorAll('input[type="radio"]').forEach(el => {
+    el.addEventListener("change", () => {
+      updateProgress();
+      saveData(false);
+    });
+  });
+  document.querySelectorAll('.motivo-chip').forEach(btn => {
+    btn.addEventListener('click', () => appendMotivo(Number(btn.dataset.index), btn.dataset.text));
+  });
+  document.querySelectorAll('[id^="obs-"]').forEach(el => {
+    el.addEventListener('input', () => saveData(false));
+  });
+}
+
+function renderChecklist() {
+  const container = document.getElementById('checklistContent');
+  const saved = collectData();
+  container.innerHTML = config.items.map((item, index) => `
+    <section class="item" data-index="${index}">
+      <div class="item-head">
+        <div>
+          <h4>${index + 1} — ${escapeHtml(item.title)} <span class="badge" id="badge-${index}" style="display:none;"></span></h4>
+          <p class="desc">${escapeHtml(item.description || '')}</p>
+        </div>
+      </div>
+      <div class="item-grid">
+        <div class="status-panel">
+          <div class="field-title">Atendido?</div>
+          <div class="status-group">
+            ${["Sim", "Parcialmente", "Não", "N/A"].map(status => `<label class="status-option"><input type="radio" name="status-${index}" value="${status}"><span>${status}</span></label>`).join('')}
+          </div>
+          <details class="motivos-box" id="motivos-${index}">
+            <summary>Motivos sugeridos</summary>
+            <div class="motivos-list">
+              ${(item.motivos || []).map(text => `<button type="button" class="motivo-chip" data-index="${index}" data-text="${escapeHtml(text)}">• ${escapeHtml(text)}</button>`).join('') || '<span class="motivos-empty">Nenhum motivo cadastrado.</span>'}
+            </div>
+          </details>
+        </div>
+        <div class="obs-panel">
+          <label for="obs-${index}" class="field-title">Observação:</label>
+          <textarea id="obs-${index}" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </div>
+    </section>`).join('');
+  bindChecklistEvents();
+  restoreChecklistItems(saved.itens || []);
+  updateProgress();
 }
 
 function updateProgress() {
@@ -734,115 +804,102 @@ function updateProgress() {
     const detalhes = document.getElementById(`motivos-${i}`);
     if (!badge || !detalhes) return;
     if (selected) {
-      answered++;
+      answered += 1;
       const [label, cls] = getBadgeClass(selected.value);
       badge.textContent = label;
       badge.className = `badge ${cls}`;
-      badge.style.display = "inline-block";
-      const showMotivos = selected.value === "Parcialmente" || selected.value === "Não";
-      detalhes.style.display = showMotivos ? "block" : "none";
+      badge.style.display = 'inline-block';
+      const showMotivos = selected.value === 'Parcialmente' || selected.value === 'Não';
+      detalhes.style.display = showMotivos ? 'block' : 'none';
       detalhes.open = showMotivos;
-      detalhes.querySelectorAll(".motivos-subblock").forEach(el => {
-        el.style.display = showMotivos && el.dataset.for === selected.value ? "block" : "none";
-      });
     } else {
-      badge.style.display = "none";
-      detalhes.style.display = "none";
+      badge.style.display = 'none';
+      detalhes.style.display = 'none';
       detalhes.open = false;
     }
   });
   const pct = Math.round((answered / totalItems) * 100);
-  progressFill.style.width = pct + "%";
+  progressFill.style.width = `${pct}%`;
   progressLabel.textContent = `${pct}% concluído`;
 }
 
-function appendMotivo(index, text) {
-  const obs = document.getElementById(`obs-${index}`);
-  if (!obs) return;
-  const current = obs.value.trim();
-  obs.value = !current ? `Motivo: ${text}` : current.includes(text) ? current : current + `
+function parseDateInput(value) {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const br = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (br) return new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]));
+  const iso = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+  const direct = new Date(trimmed);
+  return Number.isNaN(direct.getTime()) ? null : direct;
+}
 
-Motivo: ${text}`;
-  saveData(false);
+function formatFormalDate() {
+  const local = document.getElementById('local').value.trim();
+  const inputValue = document.getElementById('dataAss').value.trim() || document.getElementById('data').value.trim();
+  const parsedDate = parseDateInput(inputValue);
+  if (!parsedDate) return [local, inputValue].filter(Boolean).join(', ');
+  const formattedDate = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).format(parsedDate);
+  return `${local || 'Local'}, ${formattedDate}`;
 }
 
 function refreshSignatures() {
-  const value = document.getElementById("responsavel").value.trim();
-  document.getElementById("sig-responsavel").innerHTML = (value || "Responsável pela conferência") + "<br>Função/Posto-Graduação";
-}
-
-function collectData() {
-  return {
-    nup: document.getElementById("nup").value,
-    data: document.getElementById("data").value,
-    objeto: document.getElementById("objeto").value,
-    titulo: document.getElementById("titulo").value,
-    obsFinal: document.getElementById("obsFinal").value,
-    local: document.getElementById("local").value,
-    dataAss: document.getElementById("dataAss").value,
-    responsavel: document.getElementById("responsavel").value,
-    itens: config.items.map((_, i) => ({
-      status: document.querySelector(`input[name="status-${i}"]:checked`)?.value || "",
-      observacao: document.getElementById(`obs-${i}`)?.value || ""
-    }))
-  };
-}
-
-function saveData(showAlert = true) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
-  if (showAlert) alert("Dados salvos com sucesso.");
+  const nome = document.getElementById('responsavelNome').value.trim() || 'Responsável pela conferência';
+  const cargo = document.getElementById('responsavelCargo').value.trim() || 'Função / Posto / Graduação';
+  document.getElementById('sig-responsavel').innerHTML = `<div class="sign-name">${escapeHtml(nome)}</div><div class="sign-role">${escapeHtml(cargo)}</div>`;
+  document.getElementById('signDateFormal').textContent = formatFormalDate();
 }
 
 function loadData() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return;
   try {
-    const data = JSON.parse(raw);
-    ["nup", "data", "objeto", "titulo", "obsFinal", "local", "dataAss", "responsavel"].forEach(id => {
-      if (document.getElementById(id) && data[id] !== undefined) document.getElementById(id).value = data[id] || "";
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const source = raw ? JSON.parse(raw) : (embeddedState.data || null);
+    if (!source) return;
+    ["nup", "data", "objeto", "titulo", "obsFinal", "local", "dataAss", "responsavelNome", "responsavelCargo"].forEach(id => {
+      if (document.getElementById(id) && source[id] !== undefined) document.getElementById(id).value = source[id] || '';
     });
-    restoreChecklistItems(data.itens || []);
+    restoreChecklistItems(source.itens || []);
   } catch (error) {
-    console.error("Erro ao carregar dados:", error);
+    console.error('Erro ao carregar dados:', error);
   }
   refreshSignatures();
   updateProgress();
 }
 
 function clearData() {
-  if (!confirm("Deseja limpar todos os dados preenchidos?")) return;
+  if (!confirm('Deseja limpar todos os dados preenchidos?')) return;
   localStorage.removeItem(STORAGE_KEY);
-  document.querySelectorAll("input, textarea").forEach(el => {
-    if (el.type === "radio") el.checked = false;
-    else if (el.id === "titulo") el.value = config.formFields.titulo.value || DEFAULT_CONFIG.formFields.titulo.value;
-    else el.value = "";
+  document.querySelectorAll('input, textarea').forEach(el => {
+    if (el.type === 'radio') el.checked = false;
+    else if (el.id === 'titulo') el.value = config.formFields.titulo.value || DEFAULT_CONFIG.formFields.titulo.value;
+    else el.value = '';
   });
   refreshSignatures();
   updateProgress();
 }
 
 function renderAdmin() {
-  document.getElementById("adminFields").innerHTML = Object.entries(config.formFields).map(([key, field]) => `
+  document.getElementById('adminFields').innerHTML = Object.entries(config.formFields).map(([key, field]) => `
     <div class="admin-field-row">
-      <label>${field.label || key.toUpperCase()}<input data-admin-field="${key}" data-prop="label" value="${escapeHtml(field.label || "")}"></label>
-      <label>Placeholder<input data-admin-field="${key}" data-prop="placeholder" value="${escapeHtml(field.placeholder || "")}"></label>
-      ${key === "titulo" ? `<label>Valor padrão<input data-admin-field="${key}" data-prop="value" value="${escapeHtml(field.value || "")}"></label>` : ""}
-    </div>`).join("");
+      <label>${field.label || key.toUpperCase()}<input data-admin-field="${key}" data-prop="label" value="${escapeHtml(field.label || '')}"></label>
+      <label>Placeholder<input data-admin-field="${key}" data-prop="placeholder" value="${escapeHtml(field.placeholder || '')}"></label>
+      ${key === 'titulo' ? `<label>Valor padrão<input data-admin-field="${key}" data-prop="value" value="${escapeHtml(field.value || '')}"></label>` : ''}
+    </div>`).join('');
 
-  document.getElementById("adminItems").innerHTML = config.items.map((item, index) => `
+  document.getElementById('adminItems').innerHTML = config.items.map((item, index) => `
     <details class="admin-item-card" open>
-      <summary>${index + 1}. ${escapeHtml(item.title || "Novo item")}</summary>
+      <summary>${index + 1}. ${escapeHtml(item.title || 'Novo item')}</summary>
       <div class="admin-item-body">
-        <label>Título<input data-item-index="${index}" data-prop="title" value="${escapeHtml(item.title || "")}"></label>
-        <label>Descrição<textarea data-item-index="${index}" data-prop="description">${escapeHtml(item.description || "")}</textarea></label>
-        <label>Motivos para “Parcialmente”<textarea data-item-index="${index}" data-prop="parcialmente">${escapeHtml((item.motivos?.["Parcialmente"] || []).join("\n"))}</textarea></label>
-        <label>Motivos para “Não”<textarea data-item-index="${index}" data-prop="nao">${escapeHtml((item.motivos?.["Não"] || []).join("\n"))}</textarea></label>
+        <label>Título<input data-item-index="${index}" data-prop="title" value="${escapeHtml(item.title || '')}"></label>
+        <label>Descrição<textarea data-item-index="${index}" data-prop="description">${escapeHtml(item.description || '')}</textarea></label>
+        <label>Motivos gerais (um por linha)<textarea data-item-index="${index}" data-prop="motivos">${escapeHtml((item.motivos || []).join('\n'))}</textarea></label>
         <button class="alt-btn admin-remove-item" type="button" data-remove-index="${index}">Remover item</button>
       </div>
-    </details>`).join("");
+    </details>`).join('');
 
-  document.querySelectorAll("[data-admin-field]").forEach(input => {
-    input.addEventListener("input", () => {
+  document.querySelectorAll('[data-admin-field]').forEach(input => {
+    input.addEventListener('input', () => {
       const key = input.dataset.adminField;
       const prop = input.dataset.prop;
       config.formFields[key][prop] = input.value;
@@ -850,21 +907,20 @@ function renderAdmin() {
     });
   });
 
-  document.querySelectorAll("[data-item-index]").forEach(input => {
-    input.addEventListener("input", () => {
+  document.querySelectorAll('[data-item-index]').forEach(input => {
+    input.addEventListener('input', () => {
       const item = config.items[Number(input.dataset.itemIndex)];
       const prop = input.dataset.prop;
-      if (prop === "parcialmente") item.motivos["Parcialmente"] = input.value.split('\n').map(v => v.trim()).filter(Boolean);
-      else if (prop === "nao") item.motivos["Não"] = input.value.split('\n').map(v => v.trim()).filter(Boolean);
+      if (prop === 'motivos') item.motivos = input.value.split('\n').map(v => v.trim()).filter(Boolean);
       else item[prop] = input.value;
       renderChecklist();
       saveData(false);
     });
   });
 
-  document.querySelectorAll(".admin-remove-item").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (config.items.length === 1) return alert("Mantenha ao menos um item no checklist.");
+  document.querySelectorAll('.admin-remove-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (config.items.length === 1) return alert('Mantenha ao menos um item no checklist.');
       config.items.splice(Number(btn.dataset.removeIndex), 1);
       renderAdmin();
       renderChecklist();
@@ -876,64 +932,104 @@ function renderAdmin() {
 function ensureAdminAccess() {
   const savedPassword = localStorage.getItem(ADMIN_PASSWORD_KEY);
   if (!savedPassword) {
-    const firstPassword = prompt("Defina uma senha local para a área administrativa:");
+    const firstPassword = prompt('Defina uma senha local para a área administrativa:');
     if (!firstPassword) return false;
     localStorage.setItem(ADMIN_PASSWORD_KEY, firstPassword);
     return true;
   }
-  const attempt = prompt("Informe a senha da administração:");
-  return attempt === savedPassword;
+  return prompt('Informe a senha da administração:') === savedPassword;
 }
 
 function toggleAdmin(show) {
-  const adminPanel = document.getElementById("adminPanel");
-  adminPanel.hidden = !show;
-  document.querySelector(".sign-area").hidden = show;
-  document.getElementById("checklistContent").hidden = show;
+  document.getElementById('adminPanel').hidden = !show;
+  document.querySelector('.sign-area').hidden = show;
+  document.getElementById('checklistContent').hidden = show;
   if (show) renderAdmin();
 }
 
+async function exportProjectFile() {
+  refreshSignatures();
+  const serializedState = JSON.stringify({ config, data: collectData() }, null, 2).replace(/<\//g, '<\/');
+  const html = document.documentElement.outerHTML.replace(
+    /<script id="projectState" type="application\/json">[\s\S]*?<\/script>/,
+    `<script id="projectState" type="application/json">
+${serializedState}
+<\/script>`
+  );
+
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'checklist_dispensa_2rm_funcional_v2.html',
+        types: [{ description: 'Arquivo HTML', accept: { 'text/html': ['.html'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      alert('Projeto HTML salvo com persistência real no arquivo.');
+      return;
+    } catch (error) {
+      if (error?.name === 'AbortError') return;
+      console.error('Falha ao salvar no arquivo:', error);
+    }
+  }
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'checklist_dispensa_2rm_funcional_v2.html';
+  link.click();
+  URL.revokeObjectURL(link.href);
+  alert('Projeto exportado. Substitua o arquivo HTML original por esta cópia para manter as alterações em outra máquina.');
+}
+
 document.querySelectorAll("input:not([type='radio']), textarea").forEach(el => {
-  el.addEventListener("input", () => { refreshSignatures(); saveData(false); });
+  el.addEventListener('input', () => {
+    refreshSignatures();
+    saveData(false);
+  });
 });
 
-document.getElementById("btnSave").addEventListener("click", () => saveData(true));
-document.getElementById("btnClear").addEventListener("click", clearData);
-document.getElementById("btnPdf").addEventListener("click", () => {
+document.getElementById('btnSave').addEventListener('click', () => saveData(true));
+document.getElementById('btnClear').addEventListener('click', clearData);
+document.getElementById('btnPdf').addEventListener('click', () => {
   toggleAdmin(false);
   refreshSignatures();
   updateProgress();
   saveData(false);
-  document.title = (document.getElementById("nup").value || "checklist") + " - CRO2";
+  document.title = `${document.getElementById('nup').value || 'checklist'} - CRO2`;
   window.print();
 });
 
-const adminToggle = document.createElement("button");
-adminToggle.type = "button";
-adminToggle.className = "alt-btn";
-adminToggle.id = "btnAdmin";
-adminToggle.textContent = "Administração";
+const adminToggle = document.createElement('button');
+adminToggle.type = 'button';
+adminToggle.className = 'alt-btn';
+adminToggle.id = 'btnAdmin';
+adminToggle.textContent = 'Administração';
 document.querySelector('.actions').appendChild(adminToggle);
-adminToggle.addEventListener("click", () => {
-  const adminVisible = !document.getElementById("adminPanel").hidden;
-  if (adminVisible) {
-    toggleAdmin(false);
-    return;
-  }
-  if (!ensureAdminAccess()) return alert("Acesso administrativo não autorizado.");
+adminToggle.addEventListener('click', () => {
+  const adminVisible = !document.getElementById('adminPanel').hidden;
+  if (adminVisible) return toggleAdmin(false);
+  if (!ensureAdminAccess()) return alert('Acesso administrativo não autorizado.');
   toggleAdmin(true);
 });
 
-document.getElementById("btnAdminSave").addEventListener("click", () => saveConfig(true));
-document.getElementById("btnAdminReset").addEventListener("click", () => {
-  if (!confirm("Deseja restaurar a configuração padrão do gerador?")) return;
+document.getElementById('btnAdminSave').addEventListener('click', () => {
+  applyFormFieldConfig();
+  renderChecklist();
+  alert("Configurações administrativas atualizadas. Use 'Salvar projeto HTML' para persistir no arquivo.");
+});
+document.getElementById('btnAdminExport').addEventListener('click', exportProjectFile);
+document.getElementById('btnAdminReset').addEventListener('click', () => {
+  if (!confirm('Deseja restaurar a configuração padrão do gerador?')) return;
   config = structuredClone(DEFAULT_CONFIG);
-  saveConfig(false);
+  applyFormFieldConfig();
   renderAdmin();
+  renderChecklist();
   clearData();
 });
-document.getElementById("btnAddItem").addEventListener("click", () => {
-  config.items.push({ title: "Novo item", description: "", motivos: { "Parcialmente": [], "Não": [] } });
+document.getElementById('btnAddItem').addEventListener('click', () => {
+  config.items.push({ title: 'Novo item', description: '', motivos: [] });
   renderAdmin();
   renderChecklist();
   saveData(false);
