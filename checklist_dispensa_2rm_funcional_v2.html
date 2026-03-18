@@ -14,11 +14,20 @@
     --muted:#5b6570;
     --brand:#183a59;
     --brand-soft:#eef3f7;
+    --surface-soft:#f8fbfd;
     --ok:#1f7a39;
     --warn:#b87300;
     --bad:#a61b1b;
     --na:#5d6772;
     --motivo:#f6efdb;
+    --motivo-border:#d8c59a;
+    --admin-bg:#0f172a;
+    --admin-paper:#111c34;
+    --admin-line:#334155;
+    --admin-soft:#16233f;
+    --admin-accent:#38bdf8;
+    --admin-text:#e2e8f0;
+    --admin-muted:#94a3b8;
   }
   * { box-sizing:border-box; }
   body {
@@ -28,18 +37,66 @@
     font-family: "Arial", sans-serif;
   }
   .container {
-    max-width:980px;
+    max-width:1100px;
     margin:24px auto;
     padding:0 14px 36px;
   }
   .document {
     background:var(--paper);
     border:1px solid #9aa6b2;
+    border-radius:20px;
+    overflow:hidden;
     box-shadow:0 12px 28px rgba(0,0,0,.08);
+    transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  body.admin-mode {
+    background:linear-gradient(180deg, #dbeafe 0%, #eff6ff 42%, #e2e8f0 100%);
+  }
+  body.admin-mode .document {
+    background:var(--admin-paper);
+    border-color:var(--admin-line);
+    box-shadow:0 18px 40px rgba(15, 23, 42, .28);
   }
   .header {
     padding:22px 26px 12px;
     border-bottom:2px solid var(--brand);
+    background:linear-gradient(135deg, #ffffff 0%, #f6f9fc 100%);
+  }
+  .top-strip {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .mode-badge {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border-radius:999px;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    color:var(--brand);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .mode-badge::before {
+    content:"";
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:currentColor;
+    box-shadow:0 0 0 4px rgba(24,58,89,.12);
+  }
+  .header-legend {
+    font-size:13px;
+    color:var(--muted);
+    max-width:360px;
+    line-height:1.5;
   }
   .brasao {
     display:block;
@@ -92,7 +149,7 @@
   }
 
   .toolbar {
-    padding:8px 26px 14px;
+    padding:8px 26px 18px;
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -145,19 +202,47 @@
     font-size:13px;
   }
 
+  .quick-info {
+    margin:0 26px 18px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:12px;
+  }
+  .info-card {
+    border:1px solid #d9e2ec;
+    border-radius:16px;
+    background:linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+    padding:14px 16px;
+  }
+  .info-card strong {
+    display:block;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--brand);
+    margin-bottom:6px;
+  }
+  .info-card span {
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.5;
+  }
   .content {
     padding:0 26px 14px;
   }
   .item {
     border:1px solid var(--line);
-    margin-bottom:14px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:16px;
+    background:#fff;
     page-break-inside:avoid;
     break-inside:avoid;
   }
   .item-head {
-    padding:10px 12px 6px;
+    padding:14px 16px 10px;
     border-bottom:1px solid var(--line-soft);
-    background:#fbfcfd;
+    background:linear-gradient(180deg, #fbfcfd 0%, #f4f8fb 100%);
   }
   .item h4 {
     margin:0;
@@ -187,9 +272,10 @@
 
   .item-grid {
     display:grid;
-    grid-template-columns:170px 1fr;
+    grid-template-columns:minmax(190px, 230px) 1fr;
     gap:18px;
-    padding:12px;
+    padding:16px;
+    align-items:start;
   }
   .field-title {
     font-weight:700;
@@ -219,18 +305,27 @@
     width:100%;
     min-height:122px;
     border:1px solid var(--line-soft);
+    border-radius:14px;
     padding:12px;
     font-family:inherit;
     font-size:14px;
     resize:vertical;
     line-height:1.45;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
+  input {
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .motivos-box {
     display:none;
-    margin-top:8px;
-    border-top:1px solid var(--line-soft);
-    padding-top:8px;
+    margin-top:12px;
+    border:1px solid var(--line-soft);
+    border-radius:16px;
+    padding:10px 12px 12px;
+    background:var(--surface-soft);
   }
   .motivos-box[open] summary {
     margin-bottom:8px;
@@ -242,23 +337,48 @@
     font-size:14px;
   }
   .motivos-list {
+    display:grid;
+    gap:10px;
+  }
+  .motivo-item {
+    display:grid;
+    gap:6px;
+    padding:12px;
+    border-radius:14px;
+    background:#fff;
+    border:1px solid var(--motivo-border);
+  }
+  .motivo-item label {
+    font-size:12px;
+    font-weight:700;
+    color:#8a5b00;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .motivo-input-wrap {
     display:flex;
-    flex-direction:column;
     gap:8px;
+    align-items:flex-start;
   }
-  .motivo-chip {
-    text-align:left;
-    border:none;
+  .motivo-text {
+    min-height:88px;
     background:var(--motivo);
-    color:#9a5a00;
-    border-left:4px solid #b2aa8a;
-    padding:10px 10px;
-    font-size:13px;
-    line-height:1.45;
-    cursor:pointer;
+    color:#7a4b00;
+    border:1px solid var(--motivo-border);
   }
-  .motivo-chip:hover {
-    filter:brightness(.98);
+  .motivo-apply {
+    border:none;
+    border-radius:12px;
+    background:#8a5b00;
+    color:#fff;
+    padding:10px 12px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    min-width:88px;
+  }
+  .motivo-apply:hover {
+    filter:brightness(1.05);
   }
 
   .sign-area {
@@ -363,12 +483,14 @@
   }
   .admin-panel {
     padding:0 26px 24px;
+    color:var(--admin-text);
   }
   .project-save-box {
     margin-top:12px;
-    padding:12px;
-    border:1px dashed var(--line);
-    background:#f8fbfd;
+    padding:14px;
+    border:1px dashed var(--admin-accent);
+    border-radius:16px;
+    background:rgba(56, 189, 248, .08);
   }
   .project-save-box p {
     margin:6px 0 0;
@@ -393,9 +515,11 @@
     margin-top:16px;
   }
   .admin-card {
-    border:1px solid var(--line);
-    padding:16px;
-    background:#fcfdff;
+    border:1px solid var(--admin-line);
+    border-radius:18px;
+    padding:18px;
+    background:var(--admin-soft);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
   }
   .admin-field-row, .admin-item-body {
     display:grid;
@@ -414,18 +538,21 @@
   }
   .admin-card input, .admin-card textarea, .admin-item-body input, .admin-item-body textarea {
     width:100%;
-    border:1px solid var(--line-soft);
+    border:1px solid var(--admin-line);
+    border-radius:12px;
     padding:10px;
     font-family:inherit;
     font-size:14px;
     font-weight:400;
-    background:#fff;
+    background:#0b1220;
+    color:var(--admin-text);
   }
   .admin-item-card {
-    border:1px solid var(--line-soft);
+    border:1px solid var(--admin-line);
+    border-radius:16px;
     margin-top:12px;
     padding:12px;
-    background:#fff;
+    background:rgba(15, 23, 42, .4);
   }
   .admin-item-card summary {
     cursor:pointer;
@@ -435,12 +562,41 @@
     color:var(--muted);
     font-size:13px;
   }
+  body.admin-mode .header,
+  body.admin-mode .meta,
+  body.admin-mode .toolbar,
+  body.admin-mode .quick-info,
+  body.admin-mode .footer {
+    display:none;
+  }
+  body.admin-mode .main-btn {
+    background:var(--admin-accent);
+    border-color:var(--admin-accent);
+    color:#082f49;
+  }
+  body.admin-mode .alt-btn {
+    background:transparent;
+    border-color:var(--admin-line);
+    color:var(--admin-text);
+  }
+  body.admin-mode .admin-panel h3,
+  body.admin-mode .admin-panel h4,
+  body.admin-mode .admin-panel summary {
+    color:#f8fafc;
+  }
+  body.admin-mode .admin-header p,
+  body.admin-mode .admin-help,
+  body.admin-mode .project-save-box p {
+    color:var(--admin-muted);
+  }
 
   @media (max-width: 780px) {
     .item-grid { grid-template-columns:1fr; }
     .sign-lines { grid-template-columns:1fr; gap:18px; }
     .progress-wrap { width:100%; }
     .progress-bar { flex:1; width:auto; }
+    .motivo-input-wrap { flex-direction:column; }
+    .motivo-apply { width:100%; }
   }
 
   @media print {
@@ -497,6 +653,10 @@
   <div class="container">
     <div class="document">
       <div class="header">
+        <div class="top-strip">
+          <span class="mode-badge" id="modeBadge">Modo usuário</span>
+          <div class="header-legend">Preencha o checklist operacionalmente. A área administrativa possui identidade visual própria para facilitar a distinção entre edição estrutural e uso do formulário.</div>
+        </div>
         <img class="brasao" alt="Brasão das Armas da República Federativa do Brasil" src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Coat%20of%20arms%20of%20Brazil%20%28variant%201%29.svg">
         <div class="org">
           <div class="strong">MINISTÉRIO DA DEFESA</div>
@@ -537,6 +697,21 @@
           <button class="alt-btn" id="btnClear">Limpar</button>
         </div>
       </div>
+
+      <section class="quick-info" aria-label="Orientações rápidas">
+        <article class="info-card">
+          <strong>Uso do formulário</strong>
+          <span>Selecione o status do item e registre observações objetivas para sustentar a conferência processual.</span>
+        </article>
+        <article class="info-card">
+          <strong>Motivos sugeridos</strong>
+          <span>Quando houver pendência, cada motivo aparece em um campo próprio, com quebra de linha automática para evitar estouro visual.</span>
+        </article>
+        <article class="info-card">
+          <strong>Ambientes distintos</strong>
+          <span>O modo Admin usa painel escuro exclusivo para separar claramente edição de estrutura e preenchimento do checklist.</span>
+        </article>
+      </section>
 
       <div class="content" id="checklistContent"></div>
 
@@ -738,10 +913,13 @@ function saveData(showAlert = true) {
 function appendMotivo(index, text) {
   const obs = document.getElementById(`obs-${index}`);
   if (!obs) return;
+  const normalized = String(text || '').trim();
+  if (!normalized) return;
   const current = obs.value.trim();
-  obs.value = !current ? `Motivo: ${text}` : current.includes(text) ? current : `${current}
+  obs.value = !current ? `Motivo: ${normalized}` : current.includes(normalized) ? current : `${current}
 
-Motivo: ${text}`;
+Motivo: ${normalized}`;
+  obs.dispatchEvent(new Event('input', { bubbles: true }));
   saveData(false);
 }
 
@@ -752,7 +930,7 @@ function bindChecklistEvents() {
       saveData(false);
     });
   });
-  document.querySelectorAll('.motivo-chip').forEach(btn => {
+  document.querySelectorAll('.motivo-apply').forEach(btn => {
     btn.addEventListener('click', () => appendMotivo(Number(btn.dataset.index), btn.dataset.text));
   });
   document.querySelectorAll('[id^="obs-"]').forEach(el => {
@@ -780,7 +958,7 @@ function renderChecklist() {
           <details class="motivos-box" id="motivos-${index}">
             <summary>Motivos sugeridos</summary>
             <div class="motivos-list">
-              ${(item.motivos || []).map(text => `<button type="button" class="motivo-chip" data-index="${index}" data-text="${escapeHtml(text)}">• ${escapeHtml(text)}</button>`).join('') || '<span class="motivos-empty">Nenhum motivo cadastrado.</span>'}
+              ${(item.motivos || []).map((text, motivoIndex) => `<div class="motivo-item"><label for="motivo-${index}-${motivoIndex}">Motivo ${motivoIndex + 1}</label><div class="motivo-input-wrap"><textarea id="motivo-${index}-${motivoIndex}" class="motivo-text" readonly>${escapeHtml(text)}</textarea><button type="button" class="motivo-apply" data-index="${index}" data-text="${escapeHtml(text)}">Usar</button></div></div>`).join('') || '<span class="motivos-empty">Nenhum motivo cadastrado.</span>'}
             </div>
           </details>
         </div>
@@ -941,9 +1119,12 @@ function ensureAdminAccess() {
 }
 
 function toggleAdmin(show) {
+  document.body.classList.toggle('admin-mode', show);
   document.getElementById('adminPanel').hidden = !show;
   document.querySelector('.sign-area').hidden = show;
   document.getElementById('checklistContent').hidden = show;
+  document.querySelector('.quick-info').hidden = show;
+  document.getElementById('modeBadge').textContent = show ? 'Modo admin' : 'Modo usuário';
   if (show) renderAdmin();
 }
 
