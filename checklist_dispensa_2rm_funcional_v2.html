@@ -530,6 +530,13 @@
     justify-content:space-between;
     align-items:flex-start;
     gap:12px;
+    flex-wrap:wrap;
+  }
+  .admin-actions {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
   }
   .admin-header p, .admin-help {
     margin:6px 0 0;
@@ -581,6 +588,33 @@
     margin-top:12px;
     padding:12px;
     background:#ffffff;
+  }
+  .admin-motivos-head,
+  .admin-motivo-row,
+  .admin-item-actions {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .admin-motivos-list {
+    display:grid;
+    gap:10px;
+  }
+  .admin-motivo-row textarea {
+    min-height:88px;
+    flex:1 1 320px;
+  }
+  .admin-motivo-actions {
+    display:flex;
+    gap:8px;
+    align-self:stretch;
+  }
+  .admin-motivo-actions .alt-btn,
+  .admin-item-actions .alt-btn,
+  .admin-item-actions .main-btn,
+  .admin-motivos-head .alt-btn {
+    min-height:42px;
   }
   .admin-item-card summary {
     cursor:pointer;
@@ -640,7 +674,10 @@
       border:none;
       box-shadow:none;
     }
-    .toolbar {
+    .toolbar,
+    .top-strip,
+    .quick-info,
+    .footer {
       display:none !important;
     }
     .progress-wrap, .progress-bar, .progress-fill, .progress-title {
@@ -787,6 +824,7 @@
             <p>Gerencie os campos do formulário, itens do checklist e sugestões de motivos usadas no PDF.</p>
           </div>
           <div class="admin-actions">
+            <button class="alt-btn" id="btnAdminBack" type="button">Voltar ao usuário</button>
             <button class="main-btn" id="btnAdminSave">Salvar configurações</button>
             <button class="alt-btn" id="btnAdminExport">Salvar projeto HTML</button>
             <button class="alt-btn" id="btnAdminReset">Restaurar padrão</button>
@@ -1085,6 +1123,16 @@ function clearData() {
   updateProgress();
 }
 
+function updateAdminItemField(index, prop, value, options = {}) {
+  const item = config.items[index];
+  if (!item) return;
+  if (prop === 'motivos') item.motivos = value;
+  else item[prop] = value;
+  if (options.rerenderAdmin) renderAdmin();
+  renderChecklist();
+  saveData(false);
+}
+
 function renderAdmin() {
   document.getElementById('adminFields').innerHTML = Object.entries(config.formFields).map(([key, field]) => `
     <div class="admin-field-row">
@@ -1099,8 +1147,25 @@ function renderAdmin() {
       <div class="admin-item-body">
         <label>Título<input data-item-index="${index}" data-prop="title" value="${escapeHtml(item.title || '')}"></label>
         <label>Descrição<textarea data-item-index="${index}" data-prop="description">${escapeHtml(item.description || '')}</textarea></label>
-        <label>Motivos gerais (um por linha)<textarea data-item-index="${index}" data-prop="motivos">${escapeHtml((item.motivos || []).join('\n'))}</textarea></label>
-        <button class="alt-btn admin-remove-item" type="button" data-remove-index="${index}">Remover item</button>
+        <div>
+          <div class="admin-motivos-head">
+            <strong>Motivos sugeridos</strong>
+            <button class="alt-btn admin-add-motivo" type="button" data-add-motivo="${index}">Adicionar motivo</button>
+          </div>
+          <div class="admin-motivos-list">
+            ${(item.motivos || []).map((motivo, motivoIndex) => `
+              <div class="admin-motivo-row">
+                <textarea data-item-index="${index}" data-prop="motivo" data-motivo-index="${motivoIndex}" placeholder="Descreva o motivo sugerido">${escapeHtml(motivo)}</textarea>
+                <div class="admin-motivo-actions">
+                  <button class="alt-btn admin-motivo-insert" type="button" data-insert-motivo="${index}" data-after-motivo="${motivoIndex}">Inserir abaixo</button>
+                  <button class="alt-btn admin-remove-motivo" type="button" data-remove-motivo="${index}" data-motivo-index="${motivoIndex}">Remover</button>
+                </div>
+              </div>`).join('') || '<span class="motivos-empty">Nenhum motivo cadastrado.</span>'}
+          </div>
+        </div>
+        <div class="admin-item-actions">
+          <button class="alt-btn admin-remove-item" type="button" data-remove-index="${index}">Remover item</button>
+        </div>
       </div>
     </details>`).join('');
 
@@ -1115,12 +1180,42 @@ function renderAdmin() {
 
   document.querySelectorAll('[data-item-index]').forEach(input => {
     input.addEventListener('input', () => {
-      const item = config.items[Number(input.dataset.itemIndex)];
+      const index = Number(input.dataset.itemIndex);
       const prop = input.dataset.prop;
-      if (prop === 'motivos') item.motivos = input.value.split('\n').map(v => v.trim()).filter(Boolean);
-      else item[prop] = input.value;
-      renderChecklist();
-      saveData(false);
+      if (prop === 'motivo') {
+        const motivos = [...config.items[index].motivos];
+        motivos[Number(input.dataset.motivoIndex)] = input.value;
+        updateAdminItemField(index, 'motivos', motivos, { rerenderAdmin: false });
+        return;
+      }
+      updateAdminItemField(index, prop, input.value, { rerenderAdmin: prop === 'title' });
+    });
+  });
+
+  document.querySelectorAll('.admin-add-motivo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const index = Number(btn.dataset.addMotivo);
+      updateAdminItemField(index, 'motivos', [...config.items[index].motivos, ''], { rerenderAdmin: true });
+    });
+  });
+
+  document.querySelectorAll('.admin-motivo-insert').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const index = Number(btn.dataset.insertMotivo);
+      const after = Number(btn.dataset.afterMotivo);
+      const motivos = [...config.items[index].motivos];
+      motivos.splice(after + 1, 0, '');
+      updateAdminItemField(index, 'motivos', motivos, { rerenderAdmin: true });
+    });
+  });
+
+  document.querySelectorAll('.admin-remove-motivo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const index = Number(btn.dataset.removeMotivo);
+      const motivoIndex = Number(btn.dataset.motivoIndex);
+      const motivos = [...config.items[index].motivos];
+      motivos.splice(motivoIndex, 1);
+      updateAdminItemField(index, 'motivos', motivos, { rerenderAdmin: true });
     });
   });
 
@@ -1222,6 +1317,8 @@ adminToggle.addEventListener('click', () => {
   if (!ensureAdminAccess()) return alert('Acesso administrativo não autorizado.');
   toggleAdmin(true);
 });
+
+document.getElementById('btnAdminBack').addEventListener('click', () => toggleAdmin(false));
 
 document.getElementById('btnAdminSave').addEventListener('click', () => {
   applyFormFieldConfig();
