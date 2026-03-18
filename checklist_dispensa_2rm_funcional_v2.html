@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checklist de Dispensa de Licitação - 2ª RM</title>
+  <style>
+    :root {
+      --bg:#f4f6f8;
+      --card:#ffffff;
+      --ink:#1f2937;
+      --muted:#6b7280;
+      --line:#d1d5db;
+      --brand:#0f4c81;
+      --brand-2:#113a5c;
+      --ok:#15803d;
+      --warn:#b45309;
+      --bad:#b91c1c;
+      --na:#475569;
+      --shadow:0 12px 30px rgba(0,0,0,.08);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+    }
+    .container {
+      max-width:1000px;
+      margin:24px auto;
+      padding:0 16px 40px;
+    }
+    .sheet {
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .header {
+      padding:24px 28px 18px;
+      border-bottom:1px solid var(--line);
+      text-align:center;
+    }
+    .logo {
+      width:94px;
+      height:94px;
+      object-fit:contain;
+      display:block;
+      margin:0 auto 10px;
+    }
+    .header h1,.header h2,.header h3,.header p {
+      margin:4px 0;
+    }
+    .header h1 { font-size:17px; }
+    .header h2 { font-size:16px; }
+    .header h3 { font-size:15px; }
+    .meta {
+      margin-top:14px;
+      text-align:left;
+      display:grid;
+      gap:10px;
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+    }
+    .meta-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .meta label, .signature-grid label {
+      font-weight:700;
+      display:block;
+      margin-bottom:4px;
+    }
+    .meta input, .signature-grid input, .signature-grid textarea, select {
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      font-size:14px;
+      font-family:inherit;
+      background:#fff;
+    }
+    .topbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:18px 28px 10px;
+      flex-wrap:wrap;
+    }
+    .progress-wrap {
+      flex:1;
+      min-width:240px;
+    }
+    .progress-title {
+      font-weight:700;
+      margin-bottom:8px;
+    }
+    .progress-bar {
+      height:14px;
+      background:#e5e7eb;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid #d1d5db;
+    }
+    .progress-fill {
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, var(--brand), #1d7ac8);
+      transition:width .25s ease;
+    }
+    .actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    button {
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      font-weight:700;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .btn-primary { background:var(--brand); color:#fff; }
+    .btn-primary:hover { background:var(--brand-2); }
+    .btn-secondary { background:#e5e7eb; color:#111827; }
+    .btn-secondary:hover { background:#d1d5db; }
+    .btn-ghost {
+      background:#fff;
+      color:var(--brand);
+      border:1px solid var(--brand);
+    }
+    .items {
+      padding:0 28px 10px;
+    }
+    .item, .signature-box {
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:18px;
+      margin-top:16px;
+      break-inside:avoid;
+      page-break-inside:avoid;
+    }
+    .item h4 {
+      margin:0 0 10px;
+      font-size:18px;
+    }
+    .desc {
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+    .field-block {
+      margin-top:12px;
+    }
+    .status-group {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:10px 0 6px;
+    }
+    .status-option {
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 12px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      background:#fff;
+    }
+    .status-option input {
+      margin:0;
+    }
+    textarea {
+      width:100%;
+      min-height:90px;
+      resize:vertical;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      font-size:14px;
+      font-family:inherit;
+    }
+    .hint {
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .signature-wrap {
+      padding:0 28px 28px;
+    }
+    .signature-title {
+      font-size:18px;
+      font-weight:700;
+      margin:22px 0 0;
+    }
+    .signature-grid {
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+    }
+    .signature-line {
+      margin-top:28px;
+      padding-top:12px;
+      border-top:1px solid #444;
+      text-align:center;
+      min-height:50px;
+      font-size:14px;
+    }
+    .signature-columns {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+      margin-top:18px;
+    }
+    .footer {
+      text-align:center;
+      color:var(--muted);
+      padding:18px 24px 28px;
+      font-size:13px;
+    }
+    .print-note {
+      display:none;
+    }
+    .badge {
+      display:inline-block;
+      margin-left:8px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      color:#fff;
+      vertical-align:middle;
+    }
+    .sim { background:var(--ok); }
+    .parcial { background:var(--warn); }
+    .nao { background:var(--bad); }
+    .na { background:var(--na); }
+    @media (max-width:760px) {
+      .header,.topbar,.items,.signature-wrap { padding-left:16px;padding-right:16px; }
+      .topbar { padding-top:16px; }
+      .item h4 { font-size:16px; }
+      .meta-grid, .signature-grid, .signature-columns { grid-template-columns:1fr; }
+    }
+    @media print {
+      body { background:#fff; }
+      .container { max-width:none; margin:0; padding:0; }
+      .sheet {
+        border:none;
+        border-radius:0;
+        box-shadow:none;
+      }
+      .actions, .btn-ghost, .btn-secondary, .btn-primary {
+        display:none !important;
+      }
+      input, textarea, select {
+        border:none !important;
+        padding:0 !important;
+        background:transparent !important;
+        color:#000 !important;
+      }
+      .meta, .signature-box {
+        background:transparent;
+        border:1px solid #bbb;
+      }
+      .item {
+        margin-top:12px;
+      }
+      .status-option input {
+        accent-color:#000;
+      }
+      .hint {
+        display:none;
+      }
+      .print-note {
+        display:block;
+        font-size:12px;
+        color:#444;
+        margin-top:8px;
+      }
+      @page {
+        size:A4;
+        margin:14mm;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sheet">
+      <div class="header">
+        <img class="logo" alt="Brasão das Armas do Brasil" src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Coat%20of%20arms%20of%20Brazil%20%28variant%201%29.svg">
+        <h1>MINISTÉRIO DA DEFESA</h1>
+        <h2>EXÉRCITO BRASILEIRO</h2>
+        <h3>CMSE - 2ª REGIÃO MILITAR</h3>
+        <h3>COMISSÃO REGIONAL DE OBRAS DA 2ª RM</h3>
+
+        <div class="meta">
+          <div class="meta-grid">
+            <div>
+              <label for="nup">NUP</label>
+              <input id="nup" placeholder="Ex.: 64326.000623/2026-30" />
+            </div>
+            <div>
+              <label for="data">Data</label>
+              <input id="data" placeholder="Ex.: 18/03/2026" />
+            </div>
+          </div>
+          <div>
+            <label for="objeto">OBJETO</label>
+            <input id="objeto" placeholder="Ex.: Serviço de Calibração e Certificação dos Equipamentos de Topografia" />
+          </div>
+          <div>
+            <label for="titulo">Título do checklist</label>
+            <input id="titulo" value="Conformidade do Processo (Art. 72) e Termo de Justificativas" />
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar">
+        <div class="progress-wrap">
+          <div class="progress-title"><span id="progressLabel">0% concluído</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="print-note">Para salvar em PDF, use a caixa de impressão do navegador.</div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" id="btnPdf">Gerar PDF</button>
+          <button class="btn-secondary" id="btnClear">Limpar Dados</button>
+          <button class="btn-ghost" id="btnSave">Salvar Dados</button>
+        </div>
+      </div>
+
+      <div class="items" id="items">
+        
+      <section class="item" data-index="0">
+        <h4>1 — DFD, ETP, Análise de Riscos e TR <span class="badge" id="badge-0" style="display:none;"></span></h4>
+        <p class="desc">• DFD: necessidade/objeto/quantidade/justificativa • ETP/Riscos: se aplicável • TR/Projeto: quando exigido</p>
+
+        <div class="field-block">
+          <strong>Atendido?</strong>
+          <div class="status-group">
+            <label class="status-option">
+              <input type="radio" name="status-0" value="Sim">
+              <span>Sim</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-0" value="Parcialmente">
+              <span>Parcialmente</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-0" value="Não">
+              <span>Não</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-0" value="N/A">
+              <span>N/A</span>
+            </label>
+        </div>
+        </div>
+
+        <div class="field-block">
+          <label for="just-0"><strong>Possíveis justificativas:</strong></label>
+          <select id="just-0" class="just-select" data-index="0">
+            <option value="">Selecione uma justificativa sugerida</option><option value="Documento juntado aos autos e compatível com o objeto.">Documento juntado aos autos e compatível com o objeto.</option><option value="Não se aplica em razão da baixa complexidade da contratação.">Não se aplica em razão da baixa complexidade da contratação.</option><option value="Necessita complementação para detalhamento do objeto/quantitativos.">Necessita complementação para detalhamento do objeto/quantitativos.</option><option value="Pendente de assinatura da autoridade competente.">Pendente de assinatura da autoridade competente.</option>
+          </select>
+          <div class="hint">Ao selecionar uma justificativa, ela será adicionada à observação do item.</div>
+        </div>
+
+        <div class="field-block">
+          <label for="obs-0"><strong>Observação:</strong></label>
+          <textarea id="obs-0" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </section>
+    
+      <section class="item" data-index="1">
+        <h4>2 — Estimativa de Despesa (Art. 23) <span class="badge" id="badge-1" style="display:none;"></span></h4>
+        <p class="desc">• Cotações formais (art. 23, §1º, IV) • Equalização de escopo • Critério [média/mediana] • Dentro do limite do art. 75, II</p>
+
+        <div class="field-block">
+          <strong>Atendido?</strong>
+          <div class="status-group">
+            <label class="status-option">
+              <input type="radio" name="status-1" value="Sim">
+              <span>Sim</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-1" value="Parcialmente">
+              <span>Parcialmente</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-1" value="Não">
+              <span>Não</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-1" value="N/A">
+              <span>N/A</span>
+            </label>
+        </div>
+        </div>
+
+        <div class="field-block">
+          <label for="just-1"><strong>Possíveis justificativas:</strong></label>
+          <select id="just-1" class="just-select" data-index="1">
+            <option value="">Selecione uma justificativa sugerida</option><option value="Pesquisa de preços anexada com metodologia adequada.">Pesquisa de preços anexada com metodologia adequada.</option><option value="Cotações insuficientes ou sem equalização de escopo.">Cotações insuficientes ou sem equalização de escopo.</option><option value="Valor estimado compatível com o limite legal aplicável.">Valor estimado compatível com o limite legal aplicável.</option><option value="Necessário refazer a pesquisa para atualização dos preços.">Necessário refazer a pesquisa para atualização dos preços.</option>
+          </select>
+          <div class="hint">Ao selecionar uma justificativa, ela será adicionada à observação do item.</div>
+        </div>
+
+        <div class="field-block">
+          <label for="obs-1"><strong>Observação:</strong></label>
+          <textarea id="obs-1" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </section>
+    
+      <section class="item" data-index="2">
+        <h4>3 — Justificativa da Dispensa (Art. 74) <span class="badge" id="badge-2" style="display:none;"></span></h4>
+        <p class="desc">• Fundamento legal (art. 74, I-X) • Documento de justificativa • Análise de risco (se aplicável)</p>
+
+        <div class="field-block">
+          <strong>Atendido?</strong>
+          <div class="status-group">
+            <label class="status-option">
+              <input type="radio" name="status-2" value="Sim">
+              <span>Sim</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-2" value="Parcialmente">
+              <span>Parcialmente</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-2" value="Não">
+              <span>Não</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-2" value="N/A">
+              <span>N/A</span>
+            </label>
+        </div>
+        </div>
+
+        <div class="field-block">
+          <label for="just-2"><strong>Possíveis justificativas:</strong></label>
+          <select id="just-2" class="just-select" data-index="2">
+            <option value="">Selecione uma justificativa sugerida</option><option value="Fundamento legal indicado de forma expressa e motivada.">Fundamento legal indicado de forma expressa e motivada.</option><option value="Justificativa apresentada, mas carece de robustez na motivação.">Justificativa apresentada, mas carece de robustez na motivação.</option><option value="Não consta documento específico de justificativa da dispensa.">Não consta documento específico de justificativa da dispensa.</option><option value="Análise de risco dispensada em razão do objeto e valor.">Análise de risco dispensada em razão do objeto e valor.</option>
+          </select>
+          <div class="hint">Ao selecionar uma justificativa, ela será adicionada à observação do item.</div>
+        </div>
+
+        <div class="field-block">
+          <label for="obs-2"><strong>Observação:</strong></label>
+          <textarea id="obs-2" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </section>
+    
+      <section class="item" data-index="3">
+        <h4>4 — Parecer Jurídico <span class="badge" id="badge-3" style="display:none;"></span></h4>
+        <p class="desc">• Parecer favorável • Análise de legalidade • Conformidade com legislação</p>
+
+        <div class="field-block">
+          <strong>Atendido?</strong>
+          <div class="status-group">
+            <label class="status-option">
+              <input type="radio" name="status-3" value="Sim">
+              <span>Sim</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-3" value="Parcialmente">
+              <span>Parcialmente</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-3" value="Não">
+              <span>Não</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-3" value="N/A">
+              <span>N/A</span>
+            </label>
+        </div>
+        </div>
+
+        <div class="field-block">
+          <label for="just-3"><strong>Possíveis justificativas:</strong></label>
+          <select id="just-3" class="just-select" data-index="3">
+            <option value="">Selecione uma justificativa sugerida</option><option value="Parecer jurídico acostado aos autos com manifestação favorável.">Parecer jurídico acostado aos autos com manifestação favorável.</option><option value="Parecer jurídico apresenta ressalvas a serem saneadas.">Parecer jurídico apresenta ressalvas a serem saneadas.</option><option value="Dispensado conforme hipótese normativa aplicável.">Dispensado conforme hipótese normativa aplicável.</option><option value="Pendente de emissão pela assessoria jurídica.">Pendente de emissão pela assessoria jurídica.</option>
+          </select>
+          <div class="hint">Ao selecionar uma justificativa, ela será adicionada à observação do item.</div>
+        </div>
+
+        <div class="field-block">
+          <label for="obs-3"><strong>Observação:</strong></label>
+          <textarea id="obs-3" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </section>
+    
+      <section class="item" data-index="4">
+        <h4>5 — Aprovação da Autoridade Competente <span class="badge" id="badge-4" style="display:none;"></span></h4>
+        <p class="desc">• Assinatura do ordenador de despesas • Autorização formal • Documentação completa</p>
+
+        <div class="field-block">
+          <strong>Atendido?</strong>
+          <div class="status-group">
+            <label class="status-option">
+              <input type="radio" name="status-4" value="Sim">
+              <span>Sim</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-4" value="Parcialmente">
+              <span>Parcialmente</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-4" value="Não">
+              <span>Não</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-4" value="N/A">
+              <span>N/A</span>
+            </label>
+        </div>
+        </div>
+
+        <div class="field-block">
+          <label for="just-4"><strong>Possíveis justificativas:</strong></label>
+          <select id="just-4" class="just-select" data-index="4">
+            <option value="">Selecione uma justificativa sugerida</option><option value="Aprovação formal registrada e assinada pela autoridade competente.">Aprovação formal registrada e assinada pela autoridade competente.</option><option value="Documento existente, porém sem assinatura válida.">Documento existente, porém sem assinatura válida.</option><option value="Pendente de autorização do ordenador de despesas.">Pendente de autorização do ordenador de despesas.</option><option value="Aprovação condicionada ao saneamento das pendências listadas.">Aprovação condicionada ao saneamento das pendências listadas.</option>
+          </select>
+          <div class="hint">Ao selecionar uma justificativa, ela será adicionada à observação do item.</div>
+        </div>
+
+        <div class="field-block">
+          <label for="obs-4"><strong>Observação:</strong></label>
+          <textarea id="obs-4" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </section>
+    
+      <section class="item" data-index="5">
+        <h4>6 — Termo de Referência / Projeto Básico <span class="badge" id="badge-5" style="display:none;"></span></h4>
+        <p class="desc">• Especificações técnicas • Quantidades • Prazos • Condições de entrega</p>
+
+        <div class="field-block">
+          <strong>Atendido?</strong>
+          <div class="status-group">
+            <label class="status-option">
+              <input type="radio" name="status-5" value="Sim">
+              <span>Sim</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-5" value="Parcialmente">
+              <span>Parcialmente</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-5" value="Não">
+              <span>Não</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-5" value="N/A">
+              <span>N/A</span>
+            </label>
+        </div>
+        </div>
+
+        <div class="field-block">
+          <label for="just-5"><strong>Possíveis justificativas:</strong></label>
+          <select id="just-5" class="just-select" data-index="5">
+            <option value="">Selecione uma justificativa sugerida</option><option value="TR/Projeto Básico completo e suficiente para a contratação.">TR/Projeto Básico completo e suficiente para a contratação.</option><option value="Necessário ajustar prazos, critérios de medição ou especificações.">Necessário ajustar prazos, critérios de medição ou especificações.</option><option value="Não se aplica, conforme natureza do objeto.">Não se aplica, conforme natureza do objeto.</option><option value="Documento preliminar sem versão final aprovada.">Documento preliminar sem versão final aprovada.</option>
+          </select>
+          <div class="hint">Ao selecionar uma justificativa, ela será adicionada à observação do item.</div>
+        </div>
+
+        <div class="field-block">
+          <label for="obs-5"><strong>Observação:</strong></label>
+          <textarea id="obs-5" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </section>
+    
+      <section class="item" data-index="6">
+        <h4>7 — Conformidade Geral do Processo (Art. 72) <span class="badge" id="badge-6" style="display:none;"></span></h4>
+        <p class="desc">• Documentação completa • Procedimentos seguidos • Requisitos atendidos</p>
+
+        <div class="field-block">
+          <strong>Atendido?</strong>
+          <div class="status-group">
+            <label class="status-option">
+              <input type="radio" name="status-6" value="Sim">
+              <span>Sim</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-6" value="Parcialmente">
+              <span>Parcialmente</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-6" value="Não">
+              <span>Não</span>
+            </label>
+        
+            <label class="status-option">
+              <input type="radio" name="status-6" value="N/A">
+              <span>N/A</span>
+            </label>
+        </div>
+        </div>
+
+        <div class="field-block">
+          <label for="just-6"><strong>Possíveis justificativas:</strong></label>
+          <select id="just-6" class="just-select" data-index="6">
+            <option value="">Selecione uma justificativa sugerida</option><option value="Processo instruído de forma regular, apto ao prosseguimento.">Processo instruído de forma regular, apto ao prosseguimento.</option><option value="Processo com pendências formais sanáveis antes da contratação.">Processo com pendências formais sanáveis antes da contratação.</option><option value="Recomenda-se devolução para complementação documental.">Recomenda-se devolução para complementação documental.</option><option value="Conformidade parcial, com ressalvas registradas.">Conformidade parcial, com ressalvas registradas.</option>
+          </select>
+          <div class="hint">Ao selecionar uma justificativa, ela será adicionada à observação do item.</div>
+        </div>
+
+        <div class="field-block">
+          <label for="obs-6"><strong>Observação:</strong></label>
+          <textarea id="obs-6" placeholder="Descreva a situação, pendências ou observações."></textarea>
+        </div>
+      </section>
+    
+      </div>
+
+      <div class="signature-wrap">
+        <div class="signature-title">Assinaturas</div>
+        <div class="signature-box">
+          <div class="signature-grid">
+            <div>
+              <label for="local">Local</label>
+              <input id="local" placeholder="Ex.: São Paulo - SP" />
+            </div>
+            <div>
+              <label for="dataAss">Data da assinatura</label>
+              <input id="dataAss" placeholder="Ex.: 18 de março de 2026" />
+            </div>
+            <div>
+              <label for="elaborador">Elaborador</label>
+              <input id="elaborador" placeholder="Nome completo / posto-graduação" />
+            </div>
+            <div>
+              <label for="conferente">Conferente</label>
+              <input id="conferente" placeholder="Nome completo / posto-graduação" />
+            </div>
+            <div>
+              <label for="aprovador">Autoridade competente</label>
+              <input id="aprovador" placeholder="Nome completo / posto-graduação" />
+            </div>
+            <div>
+              <label for="obsFinal">Observações finais</label>
+              <textarea id="obsFinal" placeholder="Registre aqui observações finais do checklist."></textarea>
+            </div>
+          </div>
+
+          <div class="signature-columns">
+            <div class="signature-line" id="sig-elaborador">Assinatura do elaborador</div>
+            <div class="signature-line" id="sig-conferente">Assinatura do conferente</div>
+            <div class="signature-line" id="sig-aprovador">Assinatura da autoridade competente</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        © 2026 2ª Região Militar - Comissão Regional de Obras | Checklist de Dispensa de Licitação
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const totalItems = 7;
+    const STORAGE_KEY = "checklist_dispensa_2rm_v2";
+
+    const progressFill = document.getElementById("progressFill");
+    const progressLabel = document.getElementById("progressLabel");
+
+    function getBadgeClass(status) {
+      if (status === "Sim") return ["Sim", "sim"];
+      if (status === "Parcialmente") return ["Parcialmente", "parcial"];
+      if (status === "Não") return ["Não", "nao"];
+      return ["N/A", "na"];
+    }
+
+    function updateBadges() {
+      for (let index = 0; index < totalItems; index++) {
+        const selected = document.querySelector(`input[name="status-${index}"]:checked`);
+        const badge = document.getElementById(`badge-${index}`);
+        if (!badge) continue;
+        if (selected) {
+          const [label, cls] = getBadgeClass(selected.value);
+          badge.textContent = label;
+          badge.className = `badge ${cls}`;
+          badge.style.display = "inline-block";
+        } else {
+          badge.style.display = "none";
+        }
+      }
+    }
+
+    function updateProgress() {
+      let answered = 0;
+      for (let index = 0; index < totalItems; index++) {
+        if (document.querySelector(`input[name="status-${index}"]:checked`)) answered++;
+      }
+      const percent = Math.round((answered / totalItems) * 100);
+      progressFill.style.width = percent + "%";
+      progressLabel.textContent = `${percent}% concluído`;
+      updateBadges();
+    }
+
+    function collectData() {
+      return {
+        nup: document.getElementById("nup").value,
+        data: document.getElementById("data").value,
+        objeto: document.getElementById("objeto").value,
+        titulo: document.getElementById("titulo").value,
+        local: document.getElementById("local").value,
+        dataAss: document.getElementById("dataAss").value,
+        elaborador: document.getElementById("elaborador").value,
+        conferente: document.getElementById("conferente").value,
+        aprovador: document.getElementById("aprovador").value,
+        obsFinal: document.getElementById("obsFinal").value,
+        itens: Array.from({length: totalItems}, (_, index) => ({
+          status: document.querySelector(`input[name="status-${index}"]:checked`)?.value || "",
+          justificativa: document.getElementById(`just-${index}`).value,
+          observacao: document.getElementById(`obs-${index}`).value
+        }))
+      };
+    }
+
+    function saveData(showAlert = true) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      if (showAlert) alert("Dados salvos com sucesso.");
+    }
+
+    function loadData() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        ["nup","data","objeto","titulo","local","dataAss","elaborador","conferente","aprovador","obsFinal"].forEach(id => {
+          if (document.getElementById(id) && data[id] !== undefined) {
+            document.getElementById(id).value = data[id] || "";
+          }
+        });
+
+        (data.itens || []).forEach((item, index) => {
+          if (item.status) {
+            const radio = document.querySelector(`input[name="status-${index}"][value="${item.status}"]`);
+            if (radio) radio.checked = true;
+          }
+          const just = document.getElementById(`just-${index}`);
+          const obs = document.getElementById(`obs-${index}`);
+          if (just) just.value = item.justificativa || "";
+          if (obs) obs.value = item.observacao || "";
+        });
+      } catch (e) {
+        console.error("Erro ao carregar dados salvos:", e);
+      }
+      updateProgress();
+      refreshSignatureLabels();
+    }
+
+    function clearData() {
+      if (!confirm("Deseja limpar todos os dados preenchidos?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      document.querySelectorAll("input, textarea, select").forEach(el => {
+        if (el.type === "radio") {
+          el.checked = false;
+        } else if (el.id === "titulo") {
+          el.value = "Conformidade do Processo (Art. 72) e Termo de Justificativas";
+        } else {
+          el.value = "";
+        }
+      });
+      updateProgress();
+      refreshSignatureLabels();
+    }
+
+    function appendJustification(index, value) {
+      if (!value) return;
+      const obs = document.getElementById(`obs-${index}`);
+      if (!obs) return;
+      const current = obs.value.trim();
+      if (!current) {
+        obs.value = value;
+      } else if (!current.includes(value)) {
+        obs.value = current + "\n• " + value;
+      }
+      saveData(false);
+    }
+
+    function refreshSignatureLabels() {
+      document.getElementById("sig-elaborador").textContent =
+        document.getElementById("elaborador").value || "Assinatura do elaborador";
+      document.getElementById("sig-conferente").textContent =
+        document.getElementById("conferente").value || "Assinatura do conferente";
+      document.getElementById("sig-aprovador").textContent =
+        document.getElementById("aprovador").value || "Assinatura da autoridade competente";
+    }
+
+    function attachEvents() {
+      document.querySelectorAll('input[type="radio"]').forEach(el => {
+        el.addEventListener("change", () => {
+          updateProgress();
+          saveData(false);
+        });
+      });
+
+      document.querySelectorAll("textarea, input:not([type='radio']), select").forEach(el => {
+        el.addEventListener("input", () => {
+          refreshSignatureLabels();
+          saveData(false);
+        });
+        el.addEventListener("change", () => {
+          refreshSignatureLabels();
+          saveData(false);
+        });
+      });
+
+      document.querySelectorAll(".just-select").forEach(sel => {
+        sel.addEventListener("change", (e) => {
+          appendJustification(e.target.dataset.index, e.target.value);
+        });
+      });
+
+      document.getElementById("btnSave").addEventListener("click", () => saveData(true));
+      document.getElementById("btnClear").addEventListener("click", clearData);
+      document.getElementById("btnPdf").addEventListener("click", () => {
+        updateProgress();
+        refreshSignatureLabels();
+        saveData(false);
+        document.title = (document.getElementById("nup").value || "checklist") + " - Checklist Dispensa";
+        window.print();
+      });
+    }
+
+    attachEvents();
+    loadData();
+    updateProgress();
+  </script>
+</body>
+</html>
