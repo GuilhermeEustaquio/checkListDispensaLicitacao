@@ -19,15 +19,18 @@
     --warn:#b87300;
     --bad:#a61b1b;
     --na:#5d6772;
-    --motivo:#f6efdb;
-    --motivo-border:#d8c59a;
-    --admin-bg:#0f172a;
-    --admin-paper:#111c34;
-    --admin-line:#334155;
-    --admin-soft:#16233f;
-    --admin-accent:#38bdf8;
-    --admin-text:#e2e8f0;
-    --admin-muted:#94a3b8;
+    --motivo:#f8fbf7;
+    --motivo-border:#c9ddd1;
+    --motivo-accent:#2f855a;
+    --motivo-accent-soft:#e7f5ec;
+    --admin-bg:#f3fbf5;
+    --admin-paper:#ffffff;
+    --admin-line:#cfe3d5;
+    --admin-soft:#f6fcf7;
+    --admin-accent:#2f855a;
+    --admin-accent-strong:#256b48;
+    --admin-text:#163322;
+    --admin-muted:#557564;
   }
   * { box-sizing:border-box; }
   body {
@@ -50,12 +53,12 @@
     transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
   }
   body.admin-mode {
-    background:linear-gradient(180deg, #dbeafe 0%, #eff6ff 42%, #e2e8f0 100%);
+    background:linear-gradient(180deg, #edf9f0 0%, #f7fcf8 48%, #e5f3e9 100%);
   }
   body.admin-mode .document {
     background:var(--admin-paper);
     border-color:var(--admin-line);
-    box-shadow:0 18px 40px rgba(15, 23, 42, .28);
+    box-shadow:0 18px 40px rgba(47, 133, 90, .18);
   }
   .header {
     padding:22px 26px 12px;
@@ -321,61 +324,86 @@
 
   .motivos-box {
     display:none;
-    margin-top:12px;
-    border:1px solid var(--line-soft);
-    border-radius:16px;
-    padding:10px 12px 12px;
-    background:var(--surface-soft);
+    margin-top:14px;
+    border:1px solid var(--motivo-border);
+    border-radius:20px;
+    padding:14px;
+    background:linear-gradient(180deg, #ffffff 0%, var(--motivo-accent-soft) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
   }
   .motivos-box[open] summary {
-    margin-bottom:8px;
+    margin-bottom:12px;
   }
   .motivos-box summary {
     cursor:pointer;
-    color:#0f4c81;
+    color:var(--motivo-accent);
     font-weight:700;
     font-size:14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    list-style:none;
+  }
+  .motivos-box summary::-webkit-details-marker {
+    display:none;
+  }
+  .motivos-box summary::after {
+    content:'Expandir';
+    font-size:12px;
+    font-weight:600;
+    color:var(--motivo-accent);
+    background:#fff;
+    border:1px solid var(--motivo-border);
+    border-radius:999px;
+    padding:5px 10px;
+  }
+  .motivos-box[open] summary::after {
+    content:'Ocultar';
   }
   .motivos-list {
     display:grid;
-    gap:10px;
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    gap:12px;
   }
   .motivo-item {
     display:grid;
-    gap:6px;
-    padding:12px;
-    border-radius:14px;
+    gap:8px;
+    padding:14px;
+    border-radius:16px;
     background:#fff;
     border:1px solid var(--motivo-border);
+    box-shadow:0 8px 20px rgba(47,133,90,.08);
   }
   .motivo-item label {
-    font-size:12px;
+    font-size:11px;
     font-weight:700;
-    color:#8a5b00;
+    color:var(--motivo-accent);
     text-transform:uppercase;
-    letter-spacing:.04em;
+    letter-spacing:.08em;
   }
   .motivo-input-wrap {
-    display:flex;
-    gap:8px;
-    align-items:flex-start;
+    display:grid;
+    gap:10px;
   }
   .motivo-text {
-    min-height:88px;
+    min-height:100px;
     background:var(--motivo);
-    color:#7a4b00;
+    color:#284635;
     border:1px solid var(--motivo-border);
+    box-shadow:none;
   }
   .motivo-apply {
     border:none;
     border-radius:12px;
-    background:#8a5b00;
+    background:var(--motivo-accent);
     color:#fff;
-    padding:10px 12px;
+    padding:10px 14px;
     font-size:12px;
     font-weight:700;
     cursor:pointer;
-    min-width:88px;
+    justify-self:start;
+    min-width:104px;
   }
   .motivo-apply:hover {
     filter:brightness(1.05);
@@ -490,7 +518,7 @@
     padding:14px;
     border:1px dashed var(--admin-accent);
     border-radius:16px;
-    background:rgba(56, 189, 248, .08);
+    background:rgba(47, 133, 90, .08);
   }
   .project-save-box p {
     margin:6px 0 0;
@@ -519,7 +547,7 @@
     border-radius:18px;
     padding:18px;
     background:var(--admin-soft);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    box-shadow:0 14px 26px rgba(47,133,90,.08);
   }
   .admin-field-row, .admin-item-body {
     display:grid;
@@ -544,7 +572,7 @@
     font-family:inherit;
     font-size:14px;
     font-weight:400;
-    background:#0b1220;
+    background:#ffffff;
     color:var(--admin-text);
   }
   .admin-item-card {
@@ -552,7 +580,7 @@
     border-radius:16px;
     margin-top:12px;
     padding:12px;
-    background:rgba(15, 23, 42, .4);
+    background:#ffffff;
   }
   .admin-item-card summary {
     cursor:pointer;
@@ -572,17 +600,17 @@
   body.admin-mode .main-btn {
     background:var(--admin-accent);
     border-color:var(--admin-accent);
-    color:#082f49;
+    color:#fff;
   }
   body.admin-mode .alt-btn {
-    background:transparent;
+    background:#fff;
     border-color:var(--admin-line);
     color:var(--admin-text);
   }
   body.admin-mode .admin-panel h3,
   body.admin-mode .admin-panel h4,
   body.admin-mode .admin-panel summary {
-    color:#f8fafc;
+    color:var(--admin-accent-strong);
   }
   body.admin-mode .admin-header p,
   body.admin-mode .admin-help,
@@ -709,7 +737,7 @@
         </article>
         <article class="info-card">
           <strong>Ambientes distintos</strong>
-          <span>O modo Admin usa painel escuro exclusivo para separar claramente edição de estrutura e preenchimento do checklist.</span>
+          <span>O modo Admin usa painel claro com destaques em verde para separar claramente edição de estrutura e preenchimento do checklist.</span>
         </article>
       </section>
 
@@ -1048,7 +1076,7 @@ function loadData() {
 function clearData() {
   if (!confirm('Deseja limpar todos os dados preenchidos?')) return;
   localStorage.removeItem(STORAGE_KEY);
-  document.querySelectorAll('input, textarea').forEach(el => {
+  document.querySelectorAll('.meta input, .sign-area input, .sign-area textarea, .obs-panel textarea, .status-panel input[type="radio"]').forEach(el => {
     if (el.type === 'radio') el.checked = false;
     else if (el.id === 'titulo') el.value = config.formFields.titulo.value || DEFAULT_CONFIG.formFields.titulo.value;
     else el.value = '';
