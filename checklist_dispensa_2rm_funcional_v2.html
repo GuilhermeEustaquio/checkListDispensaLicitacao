@@ -150,6 +150,30 @@
     font-family:inherit;
     background:transparent;
   }
+  .meta-input-action {
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .meta-input-action input {
+    min-width:0;
+    flex:1;
+  }
+  .meta-inline-btn {
+    flex:0 0 auto;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--brand);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .meta-inline-btn:hover {
+    background:var(--brand-soft);
+  }
 
   .toolbar {
     padding:8px 26px 18px;
@@ -325,6 +349,7 @@
   .motivos-box {
     display:none;
     margin-top:14px;
+    width:100%; /* a) largura da box de motivos sugeridos */
     border:1px solid var(--motivo-border);
     border-radius:20px;
     padding:14px;
@@ -363,12 +388,15 @@
   }
   .motivos-list {
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(min(260px, 100%), 1fr));
     gap:12px;
+    width:100%;
   }
   .motivo-item {
     display:grid;
     gap:8px;
+    width:100%;
+    min-width:0;
     padding:14px;
     border-radius:16px;
     background:#fff;
@@ -385,8 +413,11 @@
   .motivo-input-wrap {
     display:grid;
     gap:10px;
+    min-width:0;
   }
   .motivo-text {
+    width:100%;
+    min-width:0;
     min-height:100px;
     background:var(--motivo);
     color:#284635;
@@ -657,6 +688,8 @@
     .sign-lines { grid-template-columns:1fr; gap:18px; }
     .progress-wrap { width:100%; }
     .progress-bar { flex:1; width:auto; }
+    .meta-input-action { flex-direction:column; align-items:stretch; }
+    .meta-inline-btn { width:100%; }
     .motivo-input-wrap { flex-direction:column; }
     .motivo-apply { width:100%; }
   }
@@ -738,7 +771,12 @@
             <td class="meta-label" data-label-for="nup">NUP</td>
             <td><input id="nup" placeholder="Ex.: 64326.000623/2026-30"></td>
             <td class="meta-label" data-label-for="data">DATA</td>
-            <td><input id="data" placeholder="Ex.: 18/03/2026"></td>
+            <td>
+              <div class="meta-input-action">
+                <input id="data" placeholder="Ex.: 18/03/2026">
+                <button type="button" class="meta-inline-btn" id="btnDataHoje">Hoje</button>
+              </div>
+            </td>
           </tr>
           <tr>
             <td class="meta-label" data-label-for="objeto">OBJETO</td>
@@ -1067,6 +1105,43 @@ function updateProgress() {
   progressLabel.textContent = `${pct}% concluído`;
 }
 
+function formatDatePtBr(date = new Date()) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+function fillTodayDate(targetId = 'data') {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  target.value = formatDatePtBr(); // b) botão “Hoje” da data
+  target.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function applyNupMask(value) {
+  const digits = String(value || '').replace(/\D/g, '').slice(0, 17); // c) máscara do NUP
+  const parts = [];
+  if (digits.length > 0) parts.push(digits.slice(0, 5));
+  if (digits.length > 5) parts[0] += `.${digits.slice(5, 11)}`;
+  if (digits.length > 11) parts[0] += `/${digits.slice(11, 15)}`;
+  if (digits.length > 15) parts[0] += `-${digits.slice(15, 17)}`;
+  return parts.join('');
+}
+
+function bindNupMask() {
+  const nupInput = document.getElementById('nup');
+  if (!nupInput) return;
+  const applyMask = () => {
+    nupInput.value = applyNupMask(nupInput.value);
+  };
+  nupInput.addEventListener('input', applyMask);
+  nupInput.addEventListener('paste', () => {
+    requestAnimationFrame(applyMask);
+  });
+  applyMask();
+}
+
 function parseDateInput(value) {
   if (!value) return null;
   const trimmed = value.trim();
@@ -1293,6 +1368,9 @@ document.querySelectorAll("input:not([type='radio']), textarea").forEach(el => {
     saveData(false);
   });
 });
+
+document.getElementById('btnDataHoje').addEventListener('click', () => fillTodayDate('data'));
+bindNupMask();
 
 document.getElementById('btnSave').addEventListener('click', () => saveData(true));
 document.getElementById('btnClear').addEventListener('click', clearData);
