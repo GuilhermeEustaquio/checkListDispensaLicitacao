@@ -299,10 +299,14 @@
 
   .item-grid {
     display:grid;
-    grid-template-columns:minmax(190px, 230px) 1fr;
+    grid-template-columns:minmax(190px, 230px) minmax(0, 1fr);
     gap:18px;
     padding:16px;
     align-items:start;
+  }
+  .status-panel,
+  .obs-panel {
+    min-width:0;
   }
   .field-title {
     font-weight:700;
@@ -348,8 +352,10 @@
 
   .motivos-box {
     display:none;
-    margin-top:14px;
-    width:100%; /* a) largura da box de motivos sugeridos */
+    grid-column:1 / -1;
+    margin-top:2px;
+    width:100%;
+    max-width:none;
     border:1px solid var(--motivo-border);
     border-radius:20px;
     padding:14px;
@@ -1059,17 +1065,17 @@ function renderChecklist() {
           <div class="status-group">
             ${["Sim", "Parcialmente", "Não", "N/A"].map(status => `<label class="status-option"><input type="radio" name="status-${index}" value="${status}"><span>${status}</span></label>`).join('')}
           </div>
-          <details class="motivos-box" id="motivos-${index}">
-            <summary>Motivos sugeridos</summary>
-            <div class="motivos-list">
-              ${(item.motivos || []).map((text, motivoIndex) => `<div class="motivo-item"><label for="motivo-${index}-${motivoIndex}">Motivo ${motivoIndex + 1}</label><div class="motivo-input-wrap"><textarea id="motivo-${index}-${motivoIndex}" class="motivo-text" readonly>${escapeHtml(text)}</textarea><button type="button" class="motivo-apply" data-index="${index}" data-text="${escapeHtml(text)}">Usar</button></div></div>`).join('') || '<span class="motivos-empty">Nenhum motivo cadastrado.</span>'}
-            </div>
-          </details>
         </div>
         <div class="obs-panel">
           <label for="obs-${index}" class="field-title">Observação:</label>
           <textarea id="obs-${index}" placeholder="Descreva a situação, pendências ou observações."></textarea>
         </div>
+        <details class="motivos-box" id="motivos-${index}">
+          <summary>Motivos sugeridos</summary>
+          <div class="motivos-list">
+            ${(item.motivos || []).map((text, motivoIndex) => `<div class="motivo-item"><label for="motivo-${index}-${motivoIndex}">Motivo ${motivoIndex + 1}</label><div class="motivo-input-wrap"><textarea id="motivo-${index}-${motivoIndex}" class="motivo-text" readonly>${escapeHtml(text)}</textarea><button type="button" class="motivo-apply" data-index="${index}" data-text="${escapeHtml(text)}">Usar</button></div></div>`).join('') || '<span class="motivos-empty">Nenhum motivo cadastrado.</span>'}
+          </div>
+        </details>
       </div>
     </section>`).join('');
   bindChecklistEvents();
