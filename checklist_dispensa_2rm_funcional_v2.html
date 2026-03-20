@@ -915,14 +915,78 @@ const DEFAULT_CONFIG = {
     titulo: { label: "TÍTULO", placeholder: "Conformidade do Processo (Art. 72) e Termo de Justificativas", value: "Conformidade do Processo (Art. 72) e Termo de Justificativas" }
   },
   items: [
-    { title: "DFD, ETP, Análise de Riscos e TR", description: "• DFD: necessidade/objeto/quantidade/justificativa • ETP/Riscos: se aplicável • TR/Projeto: quando exigido", motivos: ["O DFD foi juntado aos autos, porém carece de melhor detalhamento quanto ao objeto, quantitativos ou justificativa da necessidade.", "O TR/Projeto Básico foi apresentado de forma preliminar, demandando ajustes antes do prosseguimento da contratação.", "Não consta nos autos DFD/ETP/TR suficientes para demonstrar a necessidade, o escopo e os requisitos mínimos da contratação.", "Os documentos preparatórios essenciais não foram identificados ou estão ausentes no processo."] },
-    { title: "Estimativa de Despesa (Art. 23)", description: "• Cotações formais (art. 23, §1º, IV) • Equalização de escopo • Critério [média/mediana] • Dentro do limite legal aplicável", motivos: ["A pesquisa de preços foi realizada direto com o fornecedor, devido à inexistência de contratações similares recentes no Painel de Preços ou no PNCP que guardem identidade com o objeto pretendido, sendo a cotação direta a única via para aferir o valor atual praticado pelo mercado.", "A pesquisa de preços consta nos autos, porém necessita de melhor demonstração da metodologia utilizada, da equalização do escopo e da compatibilidade com o objeto pretendido.", "Não consta pesquisa de preços apta a demonstrar a compatibilidade do valor estimado com o praticado pelo mercado.", "As cotações apresentadas não permitem aferir o preço estimado em razão da divergência de escopo, ausência de metodologia ou desatualização dos valores."] },
-    { title: "Justificativa da Dispensa", description: "• Fundamento legal • Documento de justificativa • Motivação da escolha da solução", motivos: ["A justificativa da dispensa foi apresentada, porém necessita de complementação quanto à motivação e ao enquadramento legal da contratação.", "Consta fundamentação legal, mas sem robustez suficiente para demonstrar, de forma clara, a adequação da hipótese de contratação direta.", "Não consta justificativa formal da contratação direta com indicação expressa do fundamento legal aplicável.", "O processo não apresenta motivação suficiente para amparar a adoção da dispensa."] },
-    { title: "Razão da Escolha do Fornecedor", description: "• Comprovação da escolha • Compatibilidade com o objeto • Motivação da seleção", motivos: ["A razão da escolha do fornecedor foi apresentada, mas necessita de complementação para demonstrar a correlação com o objeto e a vantajosidade.", "Constam elementos de escolha, porém sem robustez suficiente para justificar a seleção do fornecedor específico.", "Não consta justificativa apta para demonstrar a razão da escolha do fornecedor.", "O processo não apresenta motivação suficiente para a seleção do fornecedor contratado."] },
-    { title: "Autorização da Autoridade Competente", description: "• Autorização formal • Assinatura competente • Data do ato", motivos: ["A autorização consta nos autos, porém sem assinatura válida, sem data ou com necessidade de ratificação formal.", "A aprovação foi registrada de forma incompleta, carecendo de regularização pela autoridade competente.", "Não consta autorização formal da autoridade competente para a contratação direta.", "O processo não apresenta ato de aprovação válido para o prosseguimento da contratação."] },
-    { title: "Publicidade e Divulgação", description: "• PNCP / Portal oficial • Divulgação dos atos essenciais • Transparência mínima exigida", motivos: ["Há indícios de publicidade parcial dos atos, porém sem comprovação integral das divulgações exigidas.", "A divulgação foi iniciada, mas ainda carece de comprovação ou complementação documental.", "Não consta comprovação de publicidade/divulgação dos atos exigidos para a contratação direta.", "O processo não demonstra atendimento às exigências mínimas de transparência."] },
-    { title: "Conformidade Geral da Instrução", description: "• Verificação final da suficiência documental • Regularidade formal para prosseguimento", motivos: ["O processo apresenta instrução parcial, com pendências formais sanáveis antes da contratação.", "A documentação principal foi juntada, mas ainda há necessidade de complementação para o regular prosseguimento.", "O processo não reúne, até o momento, os elementos mínimos necessários para a contratação.", "A instrução processual encontra-se incompleta, impedindo o prosseguimento regular."] }
-  ]
+  {
+    title: "Documento de Formalização de Demanda e Demais Artefatos",
+    description: "• DFD: necessidade/objeto/quantidade/justificativa • ETP/Riscos: se aplicável • TR/Projeto: quando exigido.",
+    motivos: [
+      "O DFD foi juntado aos autos, mas os demais Artefatos foram dispensados à luz do que prevê o inciso I, do Art 72 da Lei 14.133/2021.",
+      "Considerando a natureza simples, padronizada e amplamente conhecida do objeto, bem como a baixa complexidade técnica envolvida, entende-se que a elaboração formal de Estudo Técnico Preliminar (ETP) mostra-se dispensável no presente caso.",
+      "Considerando a natureza objetiva, comum e de baixa complexidade do objeto, cuja descrição pode ser realizada de forma clara e suficiente no próprio instrumento de formalização da contratação, optou-se pela não elaboração de Termo de Referência formal.",
+      "Considerando a baixa complexidade, o reduzido valor da contratação e a inexistência de riscos relevantes que possam comprometer a execução do objeto, concluiu-se que a formalização de matriz de riscos específica não agregaria valor ao processo.",
+      "Todos os elementos fundamentais do TR e ETP estão contidos no Aviso de Contratação e no Documento de Formalização de Demanda."
+    ]
+  },
+  {
+    title: "Estimativa de Despesa (Art. 23)",
+    description: "• Cotações formais (art. 23, §1º, IV) • Equalização de escopo • Critério [média/mediana] • Dentro do limite legal aplicável",
+    motivos: [
+      "A pesquisa de preços foi realizada direto com o fornecedor, devido à inexistência de contratações similares recentes no Painel de Preços ou no PNCP que guardem identidade com o objeto pretendido, sendo a cotação direta a única via para aferir o valor atual praticado pelo mercado.",
+      "A pesquisa de preços foi realizada diretamente com fornecedor especializado, nos termos do art. 23, §1º, inciso IV, da Lei nº 14.133/2021, em razão das características específicas do objeto, que restringem a existência de múltiplos fornecedores aptos a atender integralmente à demanda.",
+      "Embora a pesquisa de preços não tenha alcançado o quantitativo ideal de três propostas válidas, foram adotadas todas as diligências razoáveis para obtenção de cotações junto ao mercado, não tendo sido possível ampliar o número de fornecedores participantes em razão das limitações verificadas no setor, ou devido a singularidade do objeto.",
+      "Considerando a dinâmica do mercado, os lances obtidos na dispensa eletrônica foram utilizados como parâmetro para aferição da vantajosidade da contratação, em conjunto com a estimativa prévia de preços.\n\nTal procedimento encontra respaldo na Instrução Normativa SEGES/ME nº 67/2021, que admite a utilização dos valores ofertados na sessão como referência para validação do preço contratado, desde que haja estimativa prévia.",
+      "Optou-se pela utilização da média/mediana dos preços coletados, por representar de forma mais fidedigna os valores praticados no mercado, evitando distorções decorrentes de preços atípicos ou inexequíveis, em conformidade com o art. 23 da Lei nº 14.133/2021."
+    ]
+  },
+  {
+    title: "Parecer Jurídico / Parecer Técnico",
+    description: "Existência de Parecer Referencial ou Consulta Submetida à CJU.",
+    motivos: [
+      "Supressão de Parecer Jurídico em virtude da contratação se enquadra em Dispensa de Baixo Valor, Inciso II do Art. 75 da Lei 14.133/2021 - PARECER REFERENCIAL 8/2025/CONAQ/SCGP/CGU/AGU."
+    ]
+  },
+  {
+    title: "Disponibilidade Orçamentária",
+    description: "Exsitência de PRO ou NC que assegure a contratação.",
+    motivos: [
+      "Por se tratar de processo SRP, a Nota de Crédito ou disponibilidade orçamentária será emitida no momento da contratação."
+    ]
+  },
+  {
+    title: "Requisitos de Habilitação do Contratado",
+    description: "O contratado cumpriu todos os requisitos de habilitação previstos?",
+    motivos: [
+      "O contratado possui pendências de validade de certidão no SICAF, que foram sanadas com a busca direta nos emissores de cada certidão (Fiscal Estadual, Municipal, INSS e etc.)"
+    ]
+  },
+  {
+    title: "Razão de Escolha do Contratado",
+    description: "A escolha do contratado decorre da sua capacidade técnica, aderência às especificações do objeto e compatibilidade do preço com o mercado, evidenciando a vantajosidade da contratação, nos termos do art. 72, VI da Lei nº 14.133/2021.",
+    motivos: [
+      "O fornecedor apresentou proposta aderente às especificações exigidas, com condições adequadas de execução, além de comprovar experiência prévia e aptidão para o fornecimento/serviço pretendido.",
+      "Foram realizadas diligências para identificação de outros possíveis fornecedores, não sendo identificadas alternativas aptas a atender às necessidades da Administração.",
+      "O contratado atendeu integralmente às condições de habilitação e às especificações do objeto, além de ofertar preço compatível com o mercado, conforme verificado na fase de estimativa de preços.",
+      "A escolha do contratado fundamenta-se na sua notória especialização, evidenciada pela experiência comprovada, qualificação técnica e reconhecimento no mercado na área relacionada ao objeto da contratação."
+    ]
+  },
+  {
+    title: "Justificativa de Preço",
+    description: "Comprovar que o preço contratada é razoável em comparação ao mercado.",
+    motivos: [
+      "O preço contratado foi considerado compatível com os valores praticados no mercado, conforme demonstrado na pesquisa de preços constante dos autos.",
+      "A justificativa do preço foi realizada com base na análise de contratações similares e/ou valores praticados pelo próprio fornecedor em outros contratos, evidenciando compatibilidade com o mercado",
+      "Destaca-se que valores inferiores apresentaram indícios de inexequibilidade ou não atenderam integralmente às especificações técnicas exigidas, razão pela qual foram desconsiderados para fins de escolha da proposta mais vantajosa.",
+      "O preço contratado foi validado com base nos lances obtidos na dispensa eletrônica, os quais refletem valores efetivamente praticados em ambiente competitivo, corroborando a compatibilidade com o mercado."
+    ]
+  },
+  {
+    title: "Autorização da Autoridade Competente",
+    description: "",
+    motivos: [
+      "A autorização da autoridade competente será realizada mediante a assinatura da Nota de Empenho",
+      "A autorização prévia da contratação foi realizada mediante aprovação do PCA vigente"
+    ]
+  }
+]
 };
 
 const STORAGE_KEY = "checklist_cro2_v4";
