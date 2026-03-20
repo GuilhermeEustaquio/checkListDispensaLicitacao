@@ -345,6 +345,22 @@
     overflow-wrap:anywhere;
     word-break:break-word;
   }
+  /* Espelho usado apenas na impressão para preservar quebras de linha e evitar cortes de texto em campos longos. */
+  .print-textarea-mirror {
+    display:none;
+    width:100%;
+    min-height:0;
+    margin:0;
+    padding:0;
+    border:none;
+    background:transparent;
+    color:inherit;
+    font:inherit;
+    line-height:1.45;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
   input {
     overflow:hidden;
     text-overflow:ellipsis;
@@ -726,12 +742,35 @@
     button, .main-btn, .alt-btn {
       display:none !important;
     }
+    /* Na impressão, removemos limites visuais do textarea e exibimos um espelho expandido sem scrollbar. */
     input, textarea {
       border:none !important;
       outline:none !important;
       background:transparent !important;
       padding:0 !important;
       color:#000 !important;
+    }
+    textarea {
+      height:auto !important;
+      min-height:0 !important;
+      overflow:visible !important;
+      resize:none !important;
+      display:none !important;
+    }
+    .print-textarea-mirror {
+      display:block !important;
+      page-break-inside:auto;
+      break-inside:auto;
+    }
+    .obs-panel,
+    .despacho-body,
+    .item-grid,
+    .item,
+    .sign-area,
+    .despacho-box {
+      page-break-inside:auto;
+      break-inside:auto;
+      overflow:visible !important;
     }
     details.motivos-box,
     .sign-form,
@@ -749,6 +788,10 @@
     @page {
       size:A4;
       margin:12mm;
+    }
+    /* Tentativa máxima via CSS: reduzir cabeçalho/rodapé nativos. A ocultação total do caminho file:/// depende da opção do navegador/diálogo de impressão do usuário. */
+    html, body {
+      margin:0 !important;
     }
   }
 </style>
@@ -831,6 +874,7 @@
           <div class="despacho-head">DESPACHO / OBSERVAÇÕES FINAIS</div>
           <div class="despacho-body">
             <textarea id="obsFinal" placeholder="Registre as observações finais, providências, ressalvas ou encaminhamento do processo."></textarea>
+            <div class="print-textarea-mirror" id="print-obsFinal" aria-hidden="true"></div>
           </div>
         </div>
 
@@ -1031,6 +1075,45 @@ function escapeHtml(text) {
     .replaceAll('"', '&quot;');
 }
 
+
+function syncTextareaMirror(textarea) {
+  if (!textarea?.id) return;
+  const mirror = document.getElementById(`print-${textarea.id}`);
+  if (!mirror) return;
+  const value = textarea.value || '';
+  // O espelho preserva o texto integral na impressão sem depender da altura visual atual do textarea.
+  mirror.textContent = value;
+  mirror.dataset.empty = value.trim() ? 'false' : 'true';
+}
+
+function autoResizeTextarea(textarea) {
+  if (!textarea) return;
+  // Mantém o comportamento em tela e expande o campo antes da impressão para evitar cortes no conteúdo.
+  const previousHeight = textarea.style.height;
+  textarea.style.height = 'auto';
+  textarea.style.height = `${textarea.scrollHeight}px`;
+  if (!textarea.value && !previousHeight) textarea.style.height = '';
+  syncTextareaMirror(textarea);
+}
+
+function bindAutoResizeTextarea(textarea) {
+  if (!textarea || textarea.dataset.autoResizeBound === 'true') return;
+  textarea.dataset.autoResizeBound = 'true';
+  autoResizeTextarea(textarea);
+  textarea.addEventListener('input', () => autoResizeTextarea(textarea));
+}
+
+function prepareTextareasForPrint() {
+  document.querySelectorAll('textarea').forEach(textarea => {
+    autoResizeTextarea(textarea);
+    syncTextareaMirror(textarea);
+  });
+}
+
+function initializeTextareaAutoResize(scope = document) {
+  scope.querySelectorAll('textarea').forEach(bindAutoResizeTextarea);
+}
+
 function applyFormFieldConfig() {
   Object.entries(config.formFields).forEach(([key, field]) => {
     const label = document.querySelector(`[data-label-for="${key}"]`);
@@ -1068,7 +1151,10 @@ function restoreChecklistItems(items) {
       if (radio) radio.checked = true;
     }
     const obs = document.getElementById(`obs-${i}`);
-    if (obs) obs.value = item.observacao || "";
+    if (obs) {
+      obs.value = item.observacao || "";
+      autoResizeTextarea(obs);
+    }
   });
 }
 
@@ -1110,6 +1196,7 @@ function bindChecklistEvents() {
   document.querySelectorAll('[id^="obs-"]').forEach(el => {
     el.addEventListener('input', () => saveData(false));
   });
+  initializeTextareaAutoResize(document.getElementById('checklistContent'));
 }
 
 function renderChecklist() {
@@ -1133,6 +1220,7 @@ function renderChecklist() {
         <div class="obs-panel">
           <label for="obs-${index}" class="field-title">Observação:</label>
           <textarea id="obs-${index}" placeholder="Descreva a situação, pendências ou observações."></textarea>
+          <div class="print-textarea-mirror" id="print-obs-${index}" aria-hidden="true"></div>
         </div>
         <details class="motivos-box" id="motivos-${index}">
           <summary>Motivos sugeridos</summary>
@@ -1249,6 +1337,7 @@ function loadData() {
       if (document.getElementById(id) && source[id] !== undefined) document.getElementById(id).value = source[id] || '';
     });
     restoreChecklistItems(source.itens || []);
+    prepareTextareasForPrint();
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
   }
@@ -1264,6 +1353,7 @@ function clearData() {
     else if (el.id === 'titulo') el.value = config.formFields.titulo.value || DEFAULT_CONFIG.formFields.titulo.value;
     else el.value = '';
   });
+  prepareTextareasForPrint();
   refreshSignatures();
   updateProgress();
 }
@@ -1439,6 +1529,10 @@ document.querySelectorAll("input:not([type='radio']), textarea").forEach(el => {
   });
 });
 
+// Garante que os campos longos cheguem expandidos ao preview/diálogo de impressão.
+window.addEventListener('beforeprint', prepareTextareasForPrint);
+window.addEventListener('afterprint', () => initializeTextareaAutoResize());
+
 document.getElementById('btnDataHoje').addEventListener('click', () => fillTodayDate('data'));
 bindNupMask();
 
@@ -1448,6 +1542,7 @@ document.getElementById('btnPdf').addEventListener('click', () => {
   toggleAdmin(false);
   refreshSignatures();
   updateProgress();
+  prepareTextareasForPrint();
   saveData(false);
   document.title = `${document.getElementById('nup').value || 'checklist'} - CRO2`;
   window.print();
@@ -1491,8 +1586,10 @@ document.getElementById('btnAddItem').addEventListener('click', () => {
 
 applyFormFieldConfig();
 renderChecklist();
+initializeTextareaAutoResize();
 refreshSignatures();
 loadData();
+prepareTextareasForPrint();
 updateProgress();
 </script>
 </body>
